@@ -1,0 +1,104 @@
+/* Apply root styles */
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%; /* Ensure full height for the layout */
+  width: 100%; /* Ensure full width for the layout */
+  overflow: hidden; /* Prevent scrolling */
+}
+
+/* Main container for navbar and content */
+.navbar-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+}
+
+/* Sidebar styling */
+.sidebar {
+  width: 250px; /* Fixed width for sidebar */
+  background-color: #1a1a1a;
+  color: rgba(255, 255, 255, 0.87);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 10px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  position: fixed; /* Ensure it stays fixed to the left */
+  left: 0;
+  top: 0;
+  bottom: 0;
+}
+
+/* Sidebar links */
+.nav-link {
+  color: rgba(255, 255, 255, 0.87);
+  text-decoration: none;
+  margin: 10px 0;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-weight: 500;
+  background-color: transparent;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Hover effect for links */
+.nav-link:hover {
+  background-color: #646cff;
+  color: white;
+}
+
+/* Active link styling */
+.nav-link.active {
+  background-color: #535bf2;
+  color: white;
+}
+
+/* Main content area */
+.content {
+  margin-left: 250px; /* Offset content by sidebar width */
+  flex: 1;
+  padding: 20px;
+  background-color: #242424;
+  color: rgba(255, 255, 255, 0.87);
+  overflow-y: auto; /* Allow scrolling for large content */
+}
+
+/* Responsive adjustments */
+@media (prefers-color-scheme: light) {
+  .sidebar {
+    background-color: #f9f9f9;
+    color: #213547;
+  }
+
+  .nav-link {
+    color: #213547;
+  }
+
+  .nav-link:hover {
+    background-color: #747bff;
+    color: white;
+  }
+
+  .content {
+    background-color: #ffffff;
+    color: #213547;
+  }
+}
