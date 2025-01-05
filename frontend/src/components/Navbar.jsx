@@ -6,18 +6,16 @@ const Navbar = () => {
     <div className="navbar-container">
       {/* Sidebar */}
       <nav className="sidebar">
-        <NavLink to="/" className="nav-link">
-          Home Page
-        </NavLink>
         <NavLink to="/user" className="nav-link">
           User Page
         </NavLink>
-        <NavLink to="/user/requests" className="nav-link">
-          Requests
+        <NavLink to="/user/request-form" className="nav-link">
+          Request Form
+        </NavLink>
+        <NavLink to="/" className="nav-link">
+          Home Page/Logout
         </NavLink>
       </nav>
-
-      {/* Main Content */}
       <div className="content">
         <Outlet />
       </div>

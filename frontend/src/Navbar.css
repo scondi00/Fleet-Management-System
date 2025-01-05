@@ -73,7 +73,7 @@ html {
 
 /* Main content area */
 .content {
-  margin-left: 250px; /* Offset content by sidebar width */
+  margin-left: 20px; /* Offset content by sidebar width */
   flex: 1;
   padding: 20px;
   background-color: #242424;

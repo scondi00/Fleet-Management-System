@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 export default function SignIn() {
   const [user, setUser] = useState({
     email: "",
@@ -24,9 +25,15 @@ export default function SignIn() {
     }
     try {
       axios.post("http://localhost:3000/login", user).then((response) => {
-        localStorage.setItem("token", response.data.token);
-        console.log(response);
-        navigate("/user");
+        localStorage.setItem("token", response.data);
+        const decodedToken = jwtDecode(response.data);
+        const { id, role } = decodedToken;
+        if (role !== "user") {
+          alert("You are not a user");
+          return;
+        } else {
+          navigate("/user");
+        }
       });
     } catch (error) {
       console.error(error);

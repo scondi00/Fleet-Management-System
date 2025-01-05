@@ -27,7 +27,7 @@ export default function AdminSignIn() {
       axios.post("http://localhost:3000/login", admin).then((response) => {
         localStorage.setItem("token", response.data);
         const decodedToken = jwtDecode(response.data);
-        const { username, role } = decodedToken;
+        const { email, role } = decodedToken;
         if (role !== "admin") {
           alert("You are not an admin");
           return;
