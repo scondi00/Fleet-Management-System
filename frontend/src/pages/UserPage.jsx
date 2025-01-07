@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 export default function UserPage() {
   const [user, setUser] = useState(null);
@@ -21,9 +22,10 @@ export default function UserPage() {
           console.error("Error fetching user data:", error);
         });
     }
-
+    const decodedToken = jwtDecode(token);
+    const { id, role } = decodedToken;
     axios
-      .get("http://localhost:3000/user-requests", {
+      .get(`http://localhost:3000/user-requests/my-requests`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
@@ -67,7 +69,7 @@ export default function UserPage() {
       {pendingRequests.length > 0 ? (
         <div className="requests-container">
           {pendingRequests.map((request) => (
-            <div key={request.id} className="request-div">
+            <div key={request.id} className="request-div-pending">
               <p>Car type: {request.carType}</p>
               <p>Reason: {request.reason}</p>
               <p>Start Date: {request.startDate}</p>
@@ -83,6 +85,21 @@ export default function UserPage() {
       <h4>Apporved</h4>
       <hr />
       <h4>Denied</h4>
+      {deniedRequests.length > 0 ? (
+        <div className="requests-container">
+          {deniedRequests.map((request) => (
+            <div key={request.id} className="request-div-denied">
+              <p>Car type: {request.carType}</p>
+              <p>Reason: {request.reason}</p>
+              <p>Start Date: {request.startDate}</p>
+              <p>End Date: {request.endDate}</p>
+              <p>Status: {request.status}</p>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p>No denied requests</p>
+      )}
     </div>
   );
 }
