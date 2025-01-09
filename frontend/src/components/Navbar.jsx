@@ -12,6 +12,9 @@ const Navbar = () => {
         <NavLink to="/user/request-form" className="nav-link">
           Request Form
         </NavLink>
+        <NavLink to="/user/history" className="nav-link">
+          History
+        </NavLink>
         <NavLink to="/" className="nav-link">
           Home Page/Logout
         </NavLink>

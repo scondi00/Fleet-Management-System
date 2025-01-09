@@ -23,7 +23,6 @@ export default function HomePage() {
           }
         });
         setPendingRequests(pending_req);
-        console.log("Pending requests:", pending_req);
       })
       .catch((error) => {
         console.error("Error fetching user requests:", error);
@@ -33,7 +32,7 @@ export default function HomePage() {
   const denyRequest = (request) => {
     const updated_req = { req_id: request._id, status: "denied" };
     axios
-      .patch("http://localhost:3000/user-requests/all-requests", updated_req)
+      .patch("http://localhost:3000/user-requests/deny-request", updated_req)
       .then((response) => {
         console.log(response.data);
         setRefresh(!refresh);

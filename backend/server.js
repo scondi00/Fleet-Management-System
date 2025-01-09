@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const userRequestsRouter = require("./user-requests");
+const issueReportsRouter = require("./issue-reports");
 const carsRouter = require("./cars");
 const { checkToken } = require("./middlewares");
 
@@ -40,6 +41,7 @@ app.get("/", (req, res) => {
 
 app.use("/user-requests", userRequestsRouter);
 app.use("/cars", carsRouter);
+app.use("/issue-reports", issueReportsRouter);
 app.get("/user", checkToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);

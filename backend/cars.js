@@ -1,8 +1,10 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const UserRequest = require("./user-request.model");
 const router = express.Router();
 
 const { Schema } = mongoose;
+const { ObjectId } = mongoose.Types;
 
 const CarSchema = new Schema({
   brand: { type: String, required: true },
@@ -13,7 +15,16 @@ const CarSchema = new Schema({
     {
       startDate: { type: Date, required: true },
       endDate: { type: Date, required: true },
-      requester_id: { type: mongoose.Schema.Types.ObjectId, required: true },
+      requester_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
+      request_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "UserRequest",
+        required: true,
+      },
     },
   ],
 });
@@ -65,7 +76,12 @@ router.get("/available", async (req, res) => {
 });
 
 router.patch("/approve", async (req, res) => {
-  const { startDate, endDate, requester_id, car_id } = req.body;
+  const { startDate, endDate, requester_id, request_id, car_id } = req.body;
+
+  if (!startDate || !endDate || !requester_id || !car_id || !request_id) {
+    return res.status(400).json({ message: "Missing required fields." });
+  }
+
   try {
     const car = await Car.findById(car_id);
     if (!car) {
@@ -75,15 +91,95 @@ router.patch("/approve", async (req, res) => {
     const newReservation = {
       startDate: new Date(startDate),
       endDate: new Date(endDate),
-      requester_id: requester_id,
+      requester_id: requester_id, // Ensure ObjectId
+      request_id: request_id,
     };
+
     car.reservations.push(newReservation);
     await car.save();
     res.status(200).json({ message: "Reservation added successfully", car });
   } catch (error) {
+    console.error(error);
     res
       .status(500)
       .json({ message: "An error occurred while adding the reservation" });
+  }
+});
+
+router.delete("/delete-pending-req", async (req, res) => {
+  const { reservation_id } = req.body;
+  if (!reservation_id) {
+    return res.status(400).json({ message: "Missing required fields." });
+  }
+
+  try {
+    if (!ObjectId.isValid(reservation_id)) {
+      return res
+        .status(400)
+        .json({ message: "Invalid car_id or reservation_id." });
+    }
+    const deletedRequest = await UserRequest.findByIdAndDelete(
+      new ObjectId(reservation_id)
+    );
+    if (!deletedRequest) {
+      return res.status(404).json({ message: "Request not found." });
+    }
+    res.status(200).json({
+      message: "Reservation successfully cancelled.",
+      deletedRequest,
+    });
+  } catch (error) {
+    console.error("Error cancelling reservation:", error);
+    res.status(500).json({
+      message: "An error occurred while cancelling the reservation.",
+    });
+  }
+});
+
+router.delete("/delete-approved-req", async (req, res) => {
+  const { car_id, reservation_id } = req.body;
+
+  if (!car_id || !reservation_id) {
+    return res.status(400).json({ message: "Missing required fields." });
+  }
+
+  try {
+    // Validate ObjectId fields
+    if (!ObjectId.isValid(car_id) || !ObjectId.isValid(reservation_id)) {
+      return res
+        .status(400)
+        .json({ message: "Invalid car_id or reservation_id." });
+    }
+
+    // Step 1: Delete the request document
+    const deletedRequest = await UserRequest.findByIdAndDelete(
+      new ObjectId(reservation_id)
+    );
+    if (!deletedRequest) {
+      return res.status(404).json({ message: "Request not found." });
+    }
+
+    // Step 2: Remove the reservation
+    const updatedCar = await Car.findByIdAndUpdate(
+      new ObjectId(car_id), // Use new ObjectId
+      { $pull: { reservations: { request_id: new ObjectId(reservation_id) } } },
+      { new: true }
+    );
+
+    if (!updatedCar) {
+      return res.status(404).json({ message: "Car not found." });
+    }
+
+    res.status(200).json({
+      message: "Reservation successfully cancelled.",
+      deletedRequest,
+      updatedCar,
+    });
+  } catch (error) {
+    console.error("Error cancelling reservation:", error);
+    res.status(500).json({
+      message: "An error occurred while cancelling the reservation.",
+    });
   }
 });
 
@@ -92,6 +188,26 @@ router.post("/", async (req, res) => {
     const newCar = new Car(req.body);
     await newCar.save();
     res.status(201).send("Car successfully added to database");
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+router.get("/", async (req, res) => {
+  const { carId } = req.query; // Access query parameters
+
+  if (!carId) {
+    return res.status(404).json({ message: "Car not found." });
+  }
+
+  try {
+    const car = await Car.findById(carId);
+
+    if (!car) {
+      return res.status(404).json({ message: "Car not found." });
+    }
+
+    res.status(200).json(car); // Respond with the found car
   } catch (err) {
     res.status(500).send(err.message);
   }

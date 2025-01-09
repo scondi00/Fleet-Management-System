@@ -4,6 +4,8 @@ import axios from "axios";
 export default function CheckRequest({ setCheckReqPage, checkRequest }) {
   const [availableCars, setAvailableCars] = useState(null);
   const [message, setMessage] = useState(null);
+  const [modal, setModal] = useState(false);
+  const [modalMsg, setModalMsg] = useState(null);
 
   useEffect(() => {
     axios
@@ -32,22 +34,44 @@ export default function CheckRequest({ setCheckReqPage, checkRequest }) {
   }, [checkRequest]);
 
   const approveRequest = (car) => {
-    console.log("Car");
-    console.log(car);
+    // First, add reservations to the car
     axios
       .patch("http://localhost:3000/cars/approve", {
         startDate: checkRequest.startDate,
         endDate: checkRequest.endDate,
         requester_id: checkRequest.requester,
+        request_id: checkRequest._id,
         car_id: car._id,
       })
       .then((response) => {
-        console.log("Request approved:", response.data);
-        // Handle successful approval (e.g., update state, show message)
+        console.log("Car reservation successfully updated:", response.data);
+
+        // Update the request status
+        const payload = {
+          req_id: checkRequest._id,
+          status: "approved",
+          car_id: car._id,
+        };
+        console.log("Payload for updating request status:", payload);
+
+        axios
+          .patch("http://localhost:3000/user-requests/approve-request", payload)
+          .then((response) => {
+            console.log("Request status successfully updated:", response.data);
+            // Optionally, add any additional UI updates or state changes here
+          })
+          .catch((error) => {
+            console.error(
+              "Error updating request status:",
+              error.response?.data || error.message
+            );
+          });
       })
       .catch((error) => {
-        console.error("Error approving request:", error);
-        // Handle error (e.g., show error message)
+        console.error(
+          "Error approving car reservation:",
+          error.response?.data || error.message
+        );
       });
   };
 

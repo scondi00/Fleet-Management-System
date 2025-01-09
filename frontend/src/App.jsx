@@ -3,11 +3,12 @@ import "./App.css";
 import Home from "./pages/HomePage";
 import NotFound from "./pages/NotFoundPage";
 import UserPage from "./pages/UserPage";
-import UserRequestForm from "./pages/UserRequests";
+import UserRequestForm from "./pages/UserRequestForm";
 import Navbar from "./components/Navbar";
 import Admin from "./pages/AdminPage";
 import AdminNavbar from "./components/AdminNavbar";
 import AdminRequests from "./pages/AdminRequestPage";
+import UserHistoryPage from "./pages/UserHistoryPage";
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
       <Route path="/user" element={<Navbar />}>
         <Route index element={<UserPage />} />
         <Route path="request-form" element={<UserRequestForm />} />
+        <Route path="history" element={<UserHistoryPage />} />
       </Route>
       <Route path="/admin" element={<AdminNavbar />}>
         <Route index element={<Admin />} />
