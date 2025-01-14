@@ -14,9 +14,7 @@ export default function IssueForm({ setModal, problemReq }) {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/cars", {
-        params: { carId: problemReq.assigned_car_id },
-      })
+      .get(`http://localhost:3000/cars/${problemReq.assigned_car_id}`)
       .then((res) => {
         setCar(res.data);
         setFormData({

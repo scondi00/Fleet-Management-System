@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import ReactModal from "react-modal";
+
 export default function AdminSignIn() {
   const [admin, setAdmin] = useState({
     email: "",
@@ -9,10 +11,17 @@ export default function AdminSignIn() {
   });
 
   const [errors, setErrors] = useState({});
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
 
   const navigate = useNavigate();
 
-  const submitUser = (event) => {
+  const closeModal = () => {
+    setModalIsOpen(false);
+    setModalMessage("");
+  };
+
+  const submitUser = async (event) => {
     event.preventDefault();
     const { email, password } = admin;
     const newErrors = {};
@@ -24,19 +33,28 @@ export default function AdminSignIn() {
       return;
     }
     try {
-      axios.post("http://localhost:3000/login", admin).then((response) => {
-        localStorage.setItem("token", response.data);
-        const decodedToken = jwtDecode(response.data);
-        const { email, role } = decodedToken;
-        if (role !== "admin") {
-          alert("You are not an admin");
-          return;
-        } else {
-          navigate("/admin");
-        }
-      });
+      const response = await axios.post("http://localhost:3000/login", admin);
+      localStorage.setItem("token", response.data);
+      const decodedToken = jwtDecode(response.data);
+      const { email, role } = decodedToken;
+      if (role !== "admin") {
+        setModalMessage("You are not authorized as an admin.");
+        setModalIsOpen(true);
+        return;
+      } else {
+        navigate("/admin");
+      }
     } catch (error) {
       console.error(error);
+      if (error.response && error.response.status === 401) {
+        setModalMessage("Invalid credentials. Please try again.");
+        setModalIsOpen(true);
+      } else {
+        setModalMessage(
+          "An unexpected error occurred. Please try again later."
+        );
+        setModalIsOpen(true);
+      }
     }
   };
 
@@ -70,6 +88,26 @@ export default function AdminSignIn() {
         />
         <button type="submit">Sign In</button>
       </form>
+      <ReactModal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        contentLabel="Error Modal"
+        style={{
+          content: {
+            top: "50%",
+            left: "50%",
+            right: "auto",
+            bottom: "auto",
+            marginRight: "-50%",
+            transform: "translate(-50%, -50%)",
+            color: "black",
+          },
+        }}
+      >
+        <h2>Error</h2>
+        <p>{modalMessage}</p>
+        <button onClick={closeModal}>Close</button>
+      </ReactModal>
     </div>
   );
 }

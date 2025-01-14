@@ -1,4 +1,38 @@
-:root {
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  border-radius: 8px;
+  border: 1px solid #646cff;
+  padding: 20px;
+  width: 500px;
+  font-size: large;
+}
+/* :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -20,14 +54,6 @@ a {
 }
 a:hover {
   color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
 }
 
 h1 {
@@ -61,6 +87,8 @@ form {
   border-radius: 8px;
   border: 1px solid #646cff;
   padding: 20px;
+  width: 500px;
+  font-size: large;
 }
 
 @media (prefers-color-scheme: light) {
@@ -76,22 +104,16 @@ form {
   }
 }
 
-.user-page {
-  margin-left: 150px;
+/* .user-page {
   text-align: left;
+} */
+
+.check-request-page {
+  text-align: left;
+  margin-top: 35px;
 }
 
-.request-form-div {
-  display: flex;
-  width: 75%;
-  flex-direction: column;
-  gap: 1em;
-  border-radius: 8px;
-  border: 1px solid #646cff;
-  text-align: left;
-  padding: 10px;
-  margin-left: 150px;
-}
+
 
 .request-div-pending {
   flex-direction: column;
@@ -134,13 +156,17 @@ form {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  width: 2000px;
 }
 
 .available-cars-div {
+  margin-top: 10px;
+  margin-left: 10px;
   border-radius: 8px;
-  border: 1px solid #ec36d7;
+  border: 1px solid #646cff;
   text-align: left;
-  padding: 10px;
+  padding: 5px;
+  text-align: center;
   width: 20%;
 }
 .modal-background {
@@ -164,3 +190,102 @@ form {
   overflow-y: auto;
   color: #1a1a1a;
 }
+
+.car-list {
+  display: flex;
+  overflow-x: auto;
+  gap: 20px;
+}
+.car-item {
+  cursor: pointer;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  min-width: 200px;
+  text-align: center;
+  background: rgb(49, 48, 48);
+}
+.car-item:hover {
+  background: rgb(209, 99, 226);
+}
+.car-details {
+  margin-top: 20px;
+}
+.reserved {
+  background-color: red;
+  color: white;
+  padding: 5px;
+  border-radius: 3px;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 400px;
+  padding: 20px;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal h2 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.modal button {
+  display: inline-block;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.modal button:hover {
+  background-color: #646cff;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -60%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.radio-buttons-container {
+  display: flex;
+  gap: 10px; /* Adjust the gap between radio buttons as needed */
+}
+
+.damage-report {
+  flex-direction: column;
+  border-radius: 8px;
+  border: 1px solid #b6881e;
+  text-align: left;
+  padding: 10px;
+  width: 20%;
+} */

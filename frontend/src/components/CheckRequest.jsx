@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Modal from "react-modal";
 
 export default function CheckRequest({ setCheckReqPage, checkRequest }) {
   const [availableCars, setAvailableCars] = useState(null);
@@ -17,14 +18,12 @@ export default function CheckRequest({ setCheckReqPage, checkRequest }) {
         },
       })
       .then((res) => {
-        console.log(res.data);
-        // Check if the response contains a message or availableCars
         if (res.data.message) {
-          setMessage(res.data.message); // Set the no cars message
-          setAvailableCars(null); // Ensure no cars are displayed
+          setMessage(res.data.message);
+          setAvailableCars(null);
         } else if (res.data.availableCars) {
-          setAvailableCars(res.data.availableCars); // Set the available cars
-          setMessage(null); // Clear any previous message
+          setAvailableCars(res.data.availableCars);
+          setMessage(null);
         }
       })
       .catch((error) => {
@@ -34,7 +33,6 @@ export default function CheckRequest({ setCheckReqPage, checkRequest }) {
   }, [checkRequest]);
 
   const approveRequest = (car) => {
-    // First, add reservations to the car
     axios
       .patch("http://localhost:3000/cars/approve", {
         startDate: checkRequest.startDate,
@@ -43,59 +41,85 @@ export default function CheckRequest({ setCheckReqPage, checkRequest }) {
         request_id: checkRequest._id,
         car_id: car._id,
       })
-      .then((response) => {
-        console.log("Car reservation successfully updated:", response.data);
-
-        // Update the request status
-        const payload = {
-          req_id: checkRequest._id,
-          status: "approved",
-          car_id: car._id,
-        };
-        console.log("Payload for updating request status:", payload);
-
+      .then(() => {
         axios
-          .patch("http://localhost:3000/user-requests/approve-request", payload)
-          .then((response) => {
-            console.log("Request status successfully updated:", response.data);
-            // Optionally, add any additional UI updates or state changes here
+          .patch("http://localhost:3000/user-requests/approve-request", {
+            req_id: checkRequest._id,
+            status: "approved",
+            car_id: car._id,
+          })
+          .then(() => {
+            setModalMsg("Request successfully approved!");
+            setModal(true);
           })
           .catch((error) => {
-            console.error(
-              "Error updating request status:",
-              error.response?.data || error.message
-            );
+            console.error("Error updating request status:", error);
+            setModalMsg("Failed to update request status.");
+            setModal(true);
           });
       })
       .catch((error) => {
-        console.error(
-          "Error approving car reservation:",
-          error.response?.data || error.message
-        );
+        console.error("Error approving car reservation:", error);
+        setModalMsg("Failed to approve car reservation.");
+        setModal(true);
       });
   };
 
+  const formatDateTime = (dateTime) => {
+    const date = new Date(dateTime);
+    return date.toLocaleString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const closeModal = () => {
+    setModal(false);
+    window.location.reload(); // Reload the page
+  };
+
   return (
-    <div className="user-page">
-      <button onClick={() => setCheckReqPage(false)}>
-        Back to pending requests
+    <div className="check-request-page">
+      <button
+        style={{ backgroundColor: "#646cff" }}
+        onClick={() => setCheckReqPage(false)}
+      >
+        Back
       </button>
-      <div>
-        <h2>Check request for:</h2>
-        <p>Employee name: {checkRequest.name}</p>
-        <p>Employee email: {checkRequest.email}</p>
-        <h2>Specific requests</h2>
-        <p>Car type: {checkRequest.carType}</p>
-        <p>Start Date: {checkRequest.startDate}</p>
-        <p>End Date: {checkRequest.endDate}</p>
+      <div style={{ display: "flex" }}>
+        <div style={{ marginRight: "60px" }}>
+          <h2>Check request for:</h2>
+          <p>
+            <strong>Employee name:</strong> {checkRequest.name}
+          </p>
+          <p>
+            <strong>Employee email:</strong> {checkRequest.email}
+          </p>
+        </div>
+        <div>
+          <h2>Specific requests:</h2>
+          <p>
+            <strong>Car type:</strong> {checkRequest.carType}
+          </p>
+          <p>
+            <strong>Start Date:</strong>{" "}
+            {formatDateTime(checkRequest.startDate)}
+          </p>
+          <p>
+            <strong>End Date:</strong> {formatDateTime(checkRequest.endDate)}
+          </p>
+        </div>
       </div>
 
-      <h2>Available cars:</h2>
+      <h2>Available cars for this time period:</h2>
+      <i>*Including specific car type</i>
       <div>
-        {message && <p>{message}</p>}{" "}
-        {/* Display the message if there are no cars */}
+        {message && <p>{message}</p>}
         {availableCars && (
-          <ul>
+          <div style={{ display: "flex" }}>
             {availableCars.map((car, index) => (
               <div key={index} className="available-cars-div">
                 <h4>{car.brand}</h4>
@@ -106,9 +130,32 @@ export default function CheckRequest({ setCheckReqPage, checkRequest }) {
                 </button>
               </div>
             ))}
-          </ul>
+          </div>
         )}
       </div>
+
+      <Modal
+        isOpen={modal}
+        onRequestClose={closeModal}
+        contentLabel="Approval Modal"
+        style={{
+          content: {
+            top: "50%",
+            left: "50%",
+            right: "auto",
+            bottom: "auto",
+            marginRight: "-50%",
+            transform: "translate(-50%, -50%)",
+            textAlign: "center",
+            color: "black",
+          },
+        }}
+      >
+        <h2>{modalMsg}</h2>
+        <button onClick={closeModal} style={{ marginTop: "20px" }}>
+          OK
+        </button>
+      </Modal>
     </div>
   );
 }

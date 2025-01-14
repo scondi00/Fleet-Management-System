@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import Modal from "react-modal";
+
+Modal.setAppElement("#root"); // Set the root element for accessibility
 
 export default function UserRequestForm() {
   const [user, setUser] = useState(null);
@@ -14,6 +17,8 @@ export default function UserRequestForm() {
     endDate: null,
   });
   const [errors, setErrors] = useState({});
+  const [modalMessage, setModalMessage] = useState(null); // For the modal message
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -56,67 +61,64 @@ export default function UserRequestForm() {
   const submitRequest = async (e) => {
     e.preventDefault();
 
-    // Validate the form inputs
     const validationErrors = validateForm();
-    console.log("Validation Errors:", validationErrors); // Debugging: Log errors
-
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      console.log("Errors in form:", validationErrors); // Debugging: Log errors
       return;
     }
 
-    // Clear errors if validation passes
     setErrors({});
-    console.log("Form submitted successfully:", request);
-
-    // Get the token from localStorage
     const token = localStorage.getItem("token");
 
     if (!token) {
-      alert("You are not authenticated. Please log in.");
+      setModalMessage("You are not authenticated. Please log in.");
+      setIsModalOpen(true);
       return;
     }
 
     try {
-      // Send the request to the server
       const response = await axios.post(
         "http://localhost:3000/user-requests",
         request,
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Include the token in the headers
+            Authorization: `Bearer ${token}`,
           },
         }
       );
-      alert(response.data); // Success message from the server
+      setModalMessage("Your reservation was successful!");
     } catch (error) {
-      console.error("Error submitting request:", error);
-      alert(
+      setModalMessage(
         error.response?.data || "An error occurred while submitting the request"
       );
     }
+    setIsModalOpen(true);
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setRequest({ ...request, [name]: value });
-    setErrors({ ...errors, [name]: false }); // Clear the error for this field
+    setErrors({ ...errors, [name]: false });
   };
 
   const handleStartDateChange = (date) => {
     setRequest({ ...request, startDate: date });
-    setErrors({ ...errors, startDate: false }); // Clear the error for startDate
+    setErrors({ ...errors, startDate: false });
   };
 
   const handleEndDateChange = (date) => {
     setRequest({ ...request, endDate: date });
-    setErrors({ ...errors, endDate: false }); // Clear the error for endDate
+    setErrors({ ...errors, endDate: false });
+  };
+
+  const closeModalAndRefresh = () => {
+    setIsModalOpen(false);
+    window.location.reload(); // Refresh the page
   };
 
   return (
-    <div>
-      <div className="user-page">
+    <div className="pages">
+      <div>
         <h1>Request form</h1>
         <p>Please enter the details to make the request for a car.</p>
       </div>
@@ -148,9 +150,6 @@ export default function UserRequestForm() {
                 value="mini"
                 checked={request.carType === "mini"}
                 onChange={handleChange}
-                style={{
-                  borderColor: errors.carType ? "red" : "",
-                }}
               />
               Mini Car (2 people + small luggage)
             </label>
@@ -162,9 +161,6 @@ export default function UserRequestForm() {
                 value="standard"
                 checked={request.carType === "standard"}
                 onChange={handleChange}
-                style={{
-                  borderColor: errors.carType ? "red" : "",
-                }}
               />
               Standard Car (4-5 people + luggage)
             </label>
@@ -176,9 +172,6 @@ export default function UserRequestForm() {
                 value="minivan"
                 checked={request.carType === "minivan"}
                 onChange={handleChange}
-                style={{
-                  borderColor: errors.carType ? "red" : "",
-                }}
               />
               Minivan (10 people + luggage)
             </label>
@@ -193,9 +186,6 @@ export default function UserRequestForm() {
                 value="leasure"
                 checked={request.reason === "leasure"}
                 onChange={handleChange}
-                style={{
-                  borderColor: errors.reason ? "red" : "",
-                }}
               />
               Leasure
             </label>
@@ -206,9 +196,6 @@ export default function UserRequestForm() {
                 value="business"
                 checked={request.reason === "business"}
                 onChange={handleChange}
-                style={{
-                  borderColor: errors.reason ? "red" : "",
-                }}
               />
               Business
             </label>
@@ -227,9 +214,6 @@ export default function UserRequestForm() {
                 showTimeSelect
                 dateFormat="Pp"
                 placeholderText="Select start time"
-                style={{
-                  borderColor: errors.startDate ? "red" : "",
-                }}
               />
               {errors.startDate && (
                 <p style={{ color: "red" }}>{errors.startDate}</p>
@@ -247,9 +231,6 @@ export default function UserRequestForm() {
                 showTimeSelect
                 dateFormat="Pp"
                 placeholderText="Select end time"
-                style={{
-                  borderColor: errors.endDate ? "red" : "",
-                }}
               />
               {errors.endDate && (
                 <p style={{ color: "red" }}>{errors.endDate}</p>
@@ -259,6 +240,16 @@ export default function UserRequestForm() {
           <button type="submit">Submit Request</button>
         </form>
       </div>
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={closeModalAndRefresh}
+        className="modal"
+      >
+        <div>
+          <h2>{modalMessage}</h2>
+          <button onClick={closeModalAndRefresh}>Okay</button>
+        </div>
+      </Modal>
     </div>
   );
 }

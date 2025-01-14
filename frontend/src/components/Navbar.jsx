@@ -7,19 +7,20 @@ const Navbar = () => {
       {/* Sidebar */}
       <nav className="sidebar">
         <NavLink to="/user" className="nav-link">
-          User Page
+          My requests
         </NavLink>
         <NavLink to="/user/request-form" className="nav-link">
           Request Form
         </NavLink>
         <NavLink to="/user/history" className="nav-link">
-          History
+          Denied and Previous requests
         </NavLink>
         <NavLink to="/" className="nav-link">
-          Home Page/Logout
+          Log out
         </NavLink>
       </nav>
       <div className="content">
+        {/* <div className="content"> */}
         <Outlet />
       </div>
     </div>

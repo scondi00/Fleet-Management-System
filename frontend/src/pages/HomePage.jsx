@@ -1,48 +1,66 @@
-//import { Link } from "react-router-dom";
-import { Outlet } from "react-router-dom";
 import { useState } from "react";
-import SignIn from "../components/SignIn";
 import Register from "../components/Register";
 import AdminSignIn from "../components/AdminSignIn";
+import SignIn from "../components/SignIn";
+
 export default function HomePage() {
   const [signIn, setSignIn] = useState(false);
   const [register, setRegister] = useState(false);
   const [admin, setAdmin] = useState(false);
+
   return (
     <div>
-      <h1>Welcome to the Car Park</h1>
-      <p>Please sign in or register!</p>
-      <button
-        onClick={() => {
-          setSignIn(true);
-          setRegister(false);
-          setAdmin(false);
+      <div
+        className="cover-img"
+        style={{
+          backgroundImage: "url('src/assets/background.jpg')",
         }}
       >
-        Sign in
-      </button>
-      <button
-        onClick={() => {
-          setSignIn(false);
-          setRegister(false);
-          setAdmin(true);
+        <h1 style={{ textAlign: "center" }}>Welcome to the Car Park</h1>
+      </div>
+
+      <p style={{ textAlign: "center" }}>Please sign in or register!</p>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginBottom: "20px",
+          gap: "10px",
         }}
       >
-        Admin
-      </button>
-      <button
-        onClick={() => {
-          setRegister(true);
-          setSignIn(false);
-          setAdmin(false);
-        }}
-      >
-        Register
-      </button>
-      {signIn && <SignIn />}
-      {register && <Register />}
-      {admin && <AdminSignIn />}
-      <Outlet />
+        <button
+          onClick={() => {
+            setSignIn(true);
+            setRegister(false);
+            setAdmin(false);
+          }}
+        >
+          Sign in
+        </button>
+        <button
+          onClick={() => {
+            setSignIn(false);
+            setRegister(true);
+            setAdmin(false);
+          }}
+        >
+          Register
+        </button>
+        <button
+          onClick={() => {
+            setSignIn(false);
+            setRegister(false);
+            setAdmin(true);
+          }}
+        >
+          Admin Sign in
+        </button>
+      </div>
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        {signIn && <SignIn />}
+        {register && <Register />}
+        {admin && <AdminSignIn />}
+      </div>
     </div>
   );
 }

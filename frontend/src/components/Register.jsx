@@ -1,5 +1,9 @@
 import { useState } from "react";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
+import Modal from "react-modal";
+
 export default function Register() {
   const [newUser, setNewUser] = useState({
     name: "",
@@ -7,10 +11,12 @@ export default function Register() {
     password: "",
     role: "",
   });
-
   const [errors, setErrors] = useState({});
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const navigate = useNavigate();
 
-  const submitUser = (event) => {
+  const submitUser = async (event) => {
     event.preventDefault();
     const { name, email, password, role } = newUser;
     const newErrors = {};
@@ -23,12 +29,38 @@ export default function Register() {
       setErrors(newErrors);
       return;
     }
+
     try {
-      axios.post("http://localhost:3000/register", newUser).then((response) => {
-        console.log(response.data);
+      // Registration
+      await axios.post("http://localhost:3000/register", newUser);
+      setModalMessage("Registration successful! Logging you in...");
+      setModalIsOpen(true);
+
+      // Wait for the user to click "Okay"
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Login
+      const loginResponse = await axios.post("http://localhost:3000/login", {
+        email,
+        password,
       });
+      localStorage.setItem("token", loginResponse.data);
+
+      // Decode JWT and navigate based on role
+      const decodedToken = jwtDecode(loginResponse.data);
+      if (decodedToken.role === "admin") {
+        navigate("/admin");
+      } else if (decodedToken.role === "user") {
+        navigate("/user");
+      }
     } catch (error) {
       console.error(error);
+      setModalMessage(
+        error.response && error.response.status === 401
+          ? "Invalid credentials. Please try again."
+          : "An unexpected error occurred. Please try again later."
+      );
+      setModalIsOpen(true);
     }
   };
 
@@ -98,6 +130,28 @@ export default function Register() {
 
         <button type="submit">Register</button>
       </form>
+
+      {/* Modal */}
+      <Modal
+        style={{
+          content: {
+            top: "50%",
+            left: "50%",
+            right: "auto",
+            bottom: "auto",
+            marginRight: "-50%",
+            transform: "translate(-50%, -50%)",
+            color: "black",
+          },
+        }}
+        isOpen={modalIsOpen}
+        onRequestClose={() => setModalIsOpen(false)}
+        contentLabel="Message"
+        ariaHideApp={false} // For accessibility
+      >
+        <p>{modalMessage}</p>
+        <button onClick={() => setModalIsOpen(false)}>Okay</button>
+      </Modal>
     </div>
   );
 }

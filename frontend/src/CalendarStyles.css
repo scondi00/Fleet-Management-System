@@ -1,0 +1,96 @@
+/* General Calendar Styling */
+.react-calendar {
+  max-width: 1000px;
+  border: 1px solid #c541f9;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  justify-content: flex-start;
+}
+
+/* Navigation Bar */
+.react-calendar__navigation {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.react-calendar__navigation button {
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.react-calendar__navigation button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* Weekdays Header */
+.react-calendar__month-view__weekdays {
+  text-align: center;
+  font-weight: bold;
+  color: #fffdfd;
+  margin-bottom: 10px;
+}
+
+.react-calendar__month-view__weekdays__weekday {
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+/* Day Tiles */
+.react-calendar__tile {
+  width: 80px; /* Fixed width */
+  height: 80px;
+  text-align: center;
+  padding: 10px;
+  border-radius: 5px;
+  border: 0.5px solid transparent;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.react-calendar__tile:hover {
+  color: white;
+}
+
+/* Current Day Highlight */
+.react-calendar__tile--now {
+  background-color: #ffbc57;
+  color: black;
+  font-weight: bold;
+}
+
+/* Active (Selected) Day */
+.react-calendar__tile--active {
+  background-color: #d27fe4;
+  color: white;
+  font-weight: bold;
+}
+
+/* Reserved Days (Custom Styling) */
+.react-calendar__tile .reserved {
+  background-color: rgb(225, 0, 255);
+  color: white;
+  font-size: 0.8rem;
+  padding: 5px;
+  border-radius: 3px;
+  display: block;
+  margin-top: 5px;
+}
+
+/* Disabled Dates */
+.react-calendar__tile--disabled {
+  color: #ccc;
+  background: none;
+  cursor: not-allowed;
+}
+
+/* Calendar Footer */
+.react-calendar__month-view__days__day--weekend {
+  color: #d9534f; /* Highlight weekends */
+}

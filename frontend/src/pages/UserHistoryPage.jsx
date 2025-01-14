@@ -70,7 +70,7 @@ export default function UserHistoryPage() {
     return <p>Loading...</p>;
   }
   return (
-    <div className="user-page">
+    <div className="pages">
       <h1>My history:</h1>
       <h2>Past approved requests:</h2>
       {approvedRequests.length > 0 ? (

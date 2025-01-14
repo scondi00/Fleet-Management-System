@@ -22,6 +22,15 @@ export default function UserPage() {
     // Check if the current date is between startDate and endDate (inclusive)
     return currentDate >= start && currentDate <= end;
   };
+  const checkIfDateIsPassed = (endDate) => {
+    // Get the current date
+    const currentDate = new Date();
+
+    const end = new Date(endDate);
+
+    // Check if the current date is after the endDate
+    return currentDate >= end;
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -48,17 +57,14 @@ export default function UserPage() {
         const approved = [];
         const renting = [];
         response.data.forEach((request) => {
-          if (
-            request.status === "pending" &&
-            !checkIfCurrentlyRenting(request.startDate, request.endDate)
-          ) {
+          if (request.status === "pending") {
             pending.push(request);
           } else if (
             request.status === "approved" &&
-            !checkIfCurrentlyRenting(request.startDate, request.endDate)
+            !checkIfCurrentlyRenting(request.startDate, request.endDate) &&
+            !checkIfDateIsPassed(request.endDate)
           ) {
             approved.push(request);
-            console.log(request);
           } else if (
             request.status === "approved" &&
             checkIfCurrentlyRenting(request.startDate, request.endDate)
@@ -70,8 +76,6 @@ export default function UserPage() {
         setPendingRequests(pending);
         setApprovedRequests(approved);
         setCurrentlyRentinge(renting);
-
-        console.log("Approved requests:", approved);
       })
       .catch((error) => {
         console.error("Error fetching user requests:", error);
@@ -82,13 +86,24 @@ export default function UserPage() {
     return <p>Loading...</p>;
   }
 
+  const formatDateTime = (dateTime) => {
+    const date = new Date(dateTime);
+    return date.toLocaleString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   const openModal = (request) => {
     setCancelReq(request);
     setModal(true);
   };
 
   return (
-    <div className="user-page">
+    <div className="pages">
       <h1>User Page</h1>
       <p>Name: {user.name}</p>
       <p>Email: {user.email}</p>
@@ -99,9 +114,15 @@ export default function UserPage() {
         <div className="requests-container">
           {currentlyRenting.map((request) => (
             <div key={request.id} className="request-div-renting">
-              <p>Car type: {request.carType}</p>
               <p>
-                Duration: {request.startDate} to {request.endDate}
+                <strong>Car type:</strong> {request.carType}
+              </p>
+              <p>
+                <strong>Start Date: </strong>
+                {formatDateTime(request.startDate)}
+              </p>
+              <p>
+                <strong>End Date:</strong> {formatDateTime(request.endDate)}
               </p>
               <p>Reason: {request.reason}</p>
               <p>Request status: {request.status}</p>
@@ -117,11 +138,23 @@ export default function UserPage() {
         <div className="requests-container">
           {pendingRequests.map((request) => (
             <div key={request.id} className="request-div-pending">
-              <p>Car type: {request.carType}</p>
-              <p>Reason: {request.reason}</p>
-              <p>Start Date: {request.startDate}</p>
-              <p>End Date: {request.endDate}</p>
-              <p>Status: {request.status}</p>
+              <p>
+                <strong>Car type:</strong> {request.carType}
+              </p>
+              <p>
+                <strong>Reason: </strong>
+                {request.reason}
+              </p>
+              <p>
+                <strong>Start Date: </strong>
+                {formatDateTime(request.startDate)}
+              </p>
+              <p>
+                <strong>End Date:</strong> {formatDateTime(request.endDate)}
+              </p>
+              <p>
+                <strong>Status:</strong> {request.status}
+              </p>
               <button onClick={() => openModal(request)}>Cancel request</button>
             </div>
           ))}
@@ -135,12 +168,22 @@ export default function UserPage() {
         <div className="requests-container">
           {approvedRequests.map((request) => (
             <div key={request.id} className="request-div-approved">
-              <p>Car type: {request.carType}</p>
               <p>
-                Duration: {request.startDate} to {request.endDate}
+                <strong>Car type:</strong> {request.carType}
               </p>
-              <p>Reason: {request.reason}</p>
-              <p>Request status: {request.status}</p>
+              <p>
+                <strong>Start Date: </strong>
+                {formatDateTime(request.startDate)}
+              </p>
+              <p>
+                <strong>End Date:</strong> {formatDateTime(request.endDate)}
+              </p>
+              <p>
+                <strong>Reason:</strong> {request.reason}
+              </p>
+              <p>
+                <strong>Request status:</strong> {request.status}
+              </p>
               <button onClick={() => openModal(request)}>Cancel request</button>
             </div>
           ))}
