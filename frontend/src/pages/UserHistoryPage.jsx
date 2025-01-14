@@ -51,24 +51,28 @@ export default function UserHistoryPage() {
       .get(`http://localhost:3000/user-requests/my-requests`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((response) => {
-        const approved = [];
+      .then(async (response) => {
         const denied = [];
-        response.data.forEach((request) => {
+        const approvedPromises = response.data.map(async (request) => {
           if (
             request.status === "approved" &&
             checkIfPastRequests(request.endDate)
           ) {
-            approved.push(request);
+            const carResponse = await axios.get(
+              `http://localhost:3000/cars/${request.assigned_car_id}`
+            );
+            return { ...request, brand: carResponse.data.brand };
           } else if (request.status === "denied") {
             denied.push(request);
           }
+          return null;
         });
-        // Update state once with the collected data
-        setApprovedRequests(approved);
-        setDeniedRequests(denied);
 
-        console.log("Approved requests:", approved);
+        const resolvedApproved = await Promise.all(approvedPromises);
+        const filteredApproved = resolvedApproved.filter((req) => req !== null);
+
+        setApprovedRequests(filteredApproved);
+        setDeniedRequests(denied);
       })
       .catch((error) => {
         console.error("Error fetching user requests:", error);
@@ -82,22 +86,29 @@ export default function UserHistoryPage() {
     <div className="pages">
       <h1>My history:</h1>
       <h2>Past approved requests:</h2>
-      {approvedRequests.length > 0 ? (
+      {approvedRequests ? (
         <div className="requests-container">
-          {approvedRequests.map((request) => (
-            <div key={request.id} className="request-div-approved">
-              <p>Car type: {request.carType}</p>
+          {approvedRequests.map((req) => (
+            <div key={req.id} className="request-div-approved">
               <p>
-                Duration: <u>{formatDateTime(request.startDate)}</u> to{" "}
-                <u>{formatDateTime(request.endDate)}</u>
+                <strong>Car:</strong> {req.brand}
               </p>
-              <p>Reason: {request.reason}</p>
-              <p>Request status: {request.status}</p>
+              <p>
+                <strong>Duration:</strong>{" "}
+                <u>{formatDateTime(req.startDate)}</u> to{" "}
+                <u>{formatDateTime(req.endDate)}</u>
+              </p>
+              <p>
+                <strong>Reason:</strong> {req.reason}
+              </p>
+              <p>
+                <strong>Request status:</strong> {req.status}
+              </p>
               <br />
               <button
                 onClick={() => {
                   setModal(true);
-                  setProblemReq(request);
+                  setProblemReq(req);
                 }}
               >
                 Report Car Issue
@@ -114,13 +125,20 @@ export default function UserHistoryPage() {
         <div className="requests-container">
           {deniedRequests.map((request) => (
             <div key={request.id} className="request-div-denied">
-              <p>Car type: {request.carType}</p>
-              <p>Reason: {request.reason}</p>
               <p>
-                Duration: <u>{formatDateTime(request.startDate)}</u> to{" "}
+                <strong>Car type:</strong> {request.carType}
+              </p>
+              <p>
+                <strong>Reason:</strong> {request.reason}
+              </p>
+              <p>
+                <strong>Duration:</strong>{" "}
+                <u>{formatDateTime(request.startDate)}</u> to{" "}
                 <u>{formatDateTime(request.endDate)}</u>
               </p>
-              <p>Status: {request.status}</p>
+              <p>
+                <strong>Status:</strong> {request.status}
+              </p>
             </div>
           ))}
         </div>

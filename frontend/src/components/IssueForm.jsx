@@ -77,10 +77,11 @@ export default function IssueForm({ setModal, problemReq }) {
               placeholder="Describe the issue in detail"
               required
               style={{
-                width: "100%",
+                width: "480px",
                 padding: "10px",
                 marginTop: "5px",
                 height: "100px",
+                resize: "vertical",
               }}
             />
           </div>
