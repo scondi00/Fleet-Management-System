@@ -179,7 +179,7 @@ export default function UserRequestForm() {
           </div>
           <div>
             <h4>Select reason for request:</h4>
-            <label>
+            <label style={{ marginRight: "10px" }}>
               <input
                 type="radio"
                 name="reason"
@@ -203,40 +203,46 @@ export default function UserRequestForm() {
           </div>
           <div>
             <h3>Select Start and End Time</h3>
-            <div style={{ marginBottom: "20px" }}>
-              <label>Start Time:</label>
-              <DatePicker
-                selected={request.startDate}
-                onChange={handleStartDateChange}
-                selectsStart
-                startDate={request.startDate}
-                endDate={request.endDate}
-                showTimeSelect
-                dateFormat="Pp"
-                placeholderText="Select start time"
-              />
-              {errors.startDate && (
-                <p style={{ color: "red" }}>{errors.startDate}</p>
-              )}
-            </div>
-            <div>
-              <label>End Time:</label>
-              <DatePicker
-                selected={request.endDate}
-                onChange={handleEndDateChange}
-                selectsEnd
-                startDate={request.startDate}
-                endDate={request.endDate}
-                minDate={request.startDate}
-                showTimeSelect
-                dateFormat="Pp"
-                placeholderText="Select end time"
-              />
-              {errors.endDate && (
-                <p style={{ color: "red" }}>{errors.endDate}</p>
-              )}
+            <div className="start_end_date_picker_container">
+              {/* Start Time */}
+              <div>
+                <label>Start Time:</label>
+                <DatePicker
+                  selected={request.startDate}
+                  onChange={handleStartDateChange}
+                  selectsStart
+                  startDate={request.startDate}
+                  endDate={request.endDate}
+                  showTimeSelect
+                  dateFormat="Pp"
+                  placeholderText="Select start time"
+                />
+                {errors.startDate && (
+                  <p style={{ color: "red" }}>{errors.startDate}</p>
+                )}
+              </div>
+
+              {/* End Time */}
+              <div>
+                <label>End Time:</label>
+                <DatePicker
+                  selected={request.endDate}
+                  onChange={handleEndDateChange}
+                  selectsEnd
+                  startDate={request.startDate}
+                  endDate={request.endDate}
+                  minDate={request.startDate}
+                  showTimeSelect
+                  dateFormat="Pp"
+                  placeholderText="Select end time"
+                />
+                {errors.endDate && (
+                  <p style={{ color: "red" }}>{errors.endDate}</p>
+                )}
+              </div>
             </div>
           </div>
+
           <button type="submit">Submit Request</button>
         </form>
       </div>

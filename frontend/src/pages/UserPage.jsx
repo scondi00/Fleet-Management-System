@@ -104,10 +104,8 @@ export default function UserPage() {
 
   return (
     <div className="pages">
-      <h1>User Page</h1>
-      <p>Name: {user.name}</p>
+      <h1>Welcome {user.name}</h1>
       <p>Email: {user.email}</p>
-      <p>Role: {user.role}</p>
       <hr />
       <h3>Currently renting:</h3>
       {currentlyRenting.length > 0 ? (
@@ -189,7 +187,7 @@ export default function UserPage() {
           ))}
         </div>
       ) : (
-        <p>No denied requests</p>
+        <p>No upcoming reservations</p>
       )}
       {modal && (
         <CancelRequestModal setModal={setModal} cancelReq={cancelReq} />

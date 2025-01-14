@@ -14,12 +14,21 @@ export default function UserHistoryPage() {
     // Get the current date
     const currentDate = new Date();
 
-    // Convert startDate and endDate to Date objects
-
     const end = new Date(endDate);
 
     // Check if the current date after endDate (inclusive)
     return currentDate >= end;
+  };
+
+  const formatDateTime = (dateTime) => {
+    const date = new Date(dateTime);
+    return date.toLocaleString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   useEffect(() => {
@@ -79,7 +88,8 @@ export default function UserHistoryPage() {
             <div key={request.id} className="request-div-approved">
               <p>Car type: {request.carType}</p>
               <p>
-                Duration: {request.startDate} to {request.endDate}
+                Duration: <u>{formatDateTime(request.startDate)}</u> to{" "}
+                <u>{formatDateTime(request.endDate)}</u>
               </p>
               <p>Reason: {request.reason}</p>
               <p>Request status: {request.status}</p>
@@ -106,8 +116,10 @@ export default function UserHistoryPage() {
             <div key={request.id} className="request-div-denied">
               <p>Car type: {request.carType}</p>
               <p>Reason: {request.reason}</p>
-              <p>Start Date: {request.startDate}</p>
-              <p>End Date: {request.endDate}</p>
+              <p>
+                Duration: <u>{formatDateTime(request.startDate)}</u> to{" "}
+                <u>{formatDateTime(request.endDate)}</u>
+              </p>
               <p>Status: {request.status}</p>
             </div>
           ))}
