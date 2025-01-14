@@ -42,6 +42,7 @@ app.get("/", (req, res) => {
 app.use("/user-requests", userRequestsRouter);
 app.use("/cars", carsRouter);
 app.use("/issue-reports", issueReportsRouter);
+
 app.get("/user", checkToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -51,6 +52,17 @@ app.get("/user", checkToken, async (req, res) => {
     res.status(200).json(user);
   } catch (err) {
     res.status(500).send("Error retrieving user data");
+  }
+});
+app.get("/user/:userId", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId);
+    if (!user) {
+      return res.status(404).json({ message: "Car not found" });
+    }
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching car details", error });
   }
 });
 

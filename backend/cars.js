@@ -11,10 +11,19 @@ const CarSchema = new Schema({
   carType: { type: String, required: true },
   fuel: { type: String, required: true },
   MA_transmission: { type: String, required: true },
+  damaged: { type: Boolean, default: false },
+
+  aviability: {
+    isAvailable: {
+      type: Boolean,
+      default: true,
+      description: { type: String },
+    },
+  },
   reservations: [
     {
-      startDate: { type: Date, required: true },
-      endDate: { type: Date, required: true },
+      startDate: { type: Date },
+      endDate: { type: Date },
       requester_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
@@ -40,7 +49,7 @@ router.get("/available", async (req, res) => {
 
   try {
     // first find cars by car type
-    const cars = await Car.find({ carType });
+    const cars = await Car.find({ carType, "aviability.isAvailable": true });
 
     if (cars.length === 0) {
       console.log(`No cars with car type: ${carType}`);
@@ -72,6 +81,18 @@ router.get("/available", async (req, res) => {
     res
       .status(500)
       .json({ message: "An error occurred while fetching available cars." });
+  }
+});
+
+router.get("/unavailable", async (req, res) => {
+  try {
+    const damagedCars = await Car.find({ available: false });
+    res.status(200).json(damagedCars);
+  } catch (err) {
+    console.log(err);
+    res
+      .status(500)
+      .json({ message: "An error occurred while fetching damaged cars." });
   }
 });
 
@@ -193,23 +214,70 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.get("/", async (req, res) => {
-  const { carId } = req.query; // Access query parameters
+// router.get("/", async (req, res) => {
+//   const { carId } = req.query; // Access query parameters
 
-  if (!carId) {
-    return res.status(404).json({ message: "Car not found." });
+//   if (!carId) {
+//     return res.status(404).json({ message: "Car not found." });
+//   }
+
+//   try {
+//     const car = await Car.findById(carId);
+
+//     if (!car) {
+//       return res.status(404).json({ message: "Car not found." });
+//     }
+
+//     res.status(200).json(car); // Respond with the found car
+//   } catch (err) {
+//     res.status(500).send(err.message);
+//   }
+// });
+
+router.get("/", async (req, res) => {
+  try {
+    const cars = await Car.find();
+    res.status(200).json(cars);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "An error occurred while fetching cars." });
   }
+});
+
+router.get("/:carId", async (req, res) => {
+  try {
+    const car = await Car.findById(req.params.carId);
+    if (!car) {
+      return res.status(404).json({ message: "Car not found" });
+    }
+    res.json(car);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching car details", error });
+  }
+});
+router.patch("/:carId", async (req, res) => {
+  const { carId } = req.params;
+  const updates = req.body;
 
   try {
-    const car = await Car.findById(carId);
+    // Update the car with the dynamic fields
+    const updatedCar = await Car.findByIdAndUpdate(
+      carId,
+      updates, // Directly apply the fields from the request body
+      { new: true, runValidators: true } // Return updated document and validate fields
+    );
 
-    if (!car) {
-      return res.status(404).json({ message: "Car not found." });
+    if (!updatedCar) {
+      return res.status(404).json({ message: "Car not found" });
     }
 
-    res.status(200).json(car); // Respond with the found car
-  } catch (err) {
-    res.status(500).send(err.message);
+    res.status(200).json({
+      message: "Car updated successfully",
+      car: updatedCar,
+    });
+  } catch (error) {
+    console.error("Error updating car:", error);
+    res.status(500).json({ message: "An error occurred", error });
   }
 });
 
