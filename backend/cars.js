@@ -12,14 +12,7 @@ const CarSchema = new Schema({
   fuel: { type: String, required: true },
   MA_transmission: { type: String, required: true },
   damaged: { type: Boolean, default: false },
-
-  aviability: {
-    isAvailable: {
-      type: Boolean,
-      default: true,
-      description: { type: String },
-    },
-  },
+  aviability: { type: Boolean, default: true },
   reservations: [
     {
       startDate: { type: Date },
@@ -213,26 +206,6 @@ router.post("/", async (req, res) => {
     res.status(500).send(err.message);
   }
 });
-
-// router.get("/", async (req, res) => {
-//   const { carId } = req.query; // Access query parameters
-
-//   if (!carId) {
-//     return res.status(404).json({ message: "Car not found." });
-//   }
-
-//   try {
-//     const car = await Car.findById(carId);
-
-//     if (!car) {
-//       return res.status(404).json({ message: "Car not found." });
-//     }
-
-//     res.status(200).json(car); // Respond with the found car
-//   } catch (err) {
-//     res.status(500).send(err.message);
-//   }
-// });
 
 router.get("/", async (req, res) => {
   try {
