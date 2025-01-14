@@ -27,13 +27,18 @@
   background-color: #1a1a1a;
   color: rgba(255, 255, 255, 0.87);
   display: flex;
-  flex-direction: column;
+  flex-direction: column; /* Stack items vertically */
   padding: 20px 10px;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   position: fixed;
   left: 0;
   top: 0;
   bottom: 0;
+}
+.nav-links {
+  display: flex;
+  flex-direction: column; /* Stack navigation links vertically */
+  gap: 10px; /* Add spacing between links */
 }
 
 /* Sidebar links */
@@ -48,10 +53,27 @@
   background-color: transparent;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
+.nav-link-log-out {
+  color: rgba(255, 255, 255, 0.87);
+  text-decoration: none;
+  margin: 10px 0;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid #ce64ff;
+  font-weight: 500;
+  background-color: transparent;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  margin-top: auto; /* Pushes this link to the bottom */
+}
 
 /* Hover effect for links */
 .nav-link:hover {
   background-color: #646cff;
+  color: white;
+}
+
+.nav-link-log-out:hover {
+  background-color: #ce64ff;
   color: white;
 }
 
