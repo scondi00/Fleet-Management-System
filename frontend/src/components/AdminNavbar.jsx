@@ -22,7 +22,7 @@ const AdminNavbar = () => {
           All Cars
         </NavLink>
         <NavLink to="/" className="nav-link">
-          Home Page
+          Log out
         </NavLink>
       </nav>
 

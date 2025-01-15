@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import ReactModal from "react-modal"; // Import React Modal
 import CarAviabilityModal from "../components/CarAviabilityModal";
 import DeleteReportModal from "../components/DeleteReportModal";
 import FixProblemModal from "../components/modals/FixProblemModal";
+
+ReactModal.setAppElement("#root"); // Set the app element for accessibility
 
 export default function DamageReports() {
   const [damageReports, setDamageReports] = useState(null);
@@ -12,6 +15,8 @@ export default function DamageReports() {
   const [unavailableCarModal, setUnavailableCarModal] = useState(false);
   const [fixProblemModal, setFixProblemModal] = useState(false);
   const [fixProblem, setFixProblem] = useState(null);
+  const [makeCarAvailableModal, setMakeCarAvailableModal] = useState(false); // Modal state
+  const [carToMakeAvailable, setCarToMakeAvailable] = useState(null); // Selected car
 
   useEffect(() => {
     axios
@@ -19,24 +24,18 @@ export default function DamageReports() {
       .then((result) => {
         setDamageReports(result.data);
 
-        // For each report fetch additional data for person that made the report and for which car
         result.data.forEach((report, index) => {
-          // First car details
           axios
             .get(`http://localhost:3000/cars/${report.carId}`)
             .then((res) => {
-              console.log(res.data);
-              const brand = res.data.brand;
-              const damaged = res.data.damaged;
-              const available = res.data.aviability.isAvailable;
-
+              const { brand, damaged, aviability } = res.data;
               setDamageReports((prevReports) => {
                 const updatedReports = [...prevReports];
                 updatedReports[index] = {
                   ...updatedReports[index],
                   carBrand: brand,
                   damaged: damaged,
-                  available: available,
+                  available: aviability.isAvailable,
                 };
                 return updatedReports;
               });
@@ -47,39 +46,46 @@ export default function DamageReports() {
                 err
               )
             );
-
-          axios
-            .get(`http://localhost:3000/user/${report.submissioner_id}`)
-            .then((userRes) => {
-              const userName = userRes.data.name;
-              setDamageReports((prevReports) => {
-                const updatedReports = [...prevReports];
-                updatedReports[index] = {
-                  ...updatedReports[index],
-                  userName: userName,
-                };
-                return updatedReports;
-              });
-            })
-            .catch((err) =>
-              console.error(
-                `Error fetching user data for submissioner_id ${report.submissioner_id}:`,
-                err
-              )
-            );
         });
       })
       .catch((err) => {
         console.log(err);
       });
-  }, [unavailableCarModal]);
+  }, [unavailableCarModal, makeCarAvailableModal]);
+
+  const handleMakeCarAvailable = () => {
+    axios
+      .patch(`http://localhost:3000/cars/${carToMakeAvailable.carId}`, {
+        aviability: true,
+      })
+      .then(() => {
+        setMakeCarAvailableModal(false);
+        setDamageReports((prevReports) =>
+          prevReports.map((report) =>
+            report.carId === carToMakeAvailable.carId
+              ? { ...report, available: true }
+              : report
+          )
+        );
+      })
+      .catch((err) => console.error("Error making car available:", err));
+  };
 
   return (
-    <div className="user-page">
+    <div className="pages">
       <h1>Damage Reports</h1>
-      <h2>Pending reports:</h2>
+      <p>Here you will se pending and solved reports posted by employees.</p>
+      <p>If the cars is actually damaged please report it as unavailable. </p>
+      <p>If the problem was fixed, asign the report as fixed.</p>
+      <p>
+        {" "}
+        After the report is resolved, you can either delete the report, asign
+        car as available again, or both. You can also make the car available
+        again in the category: Unavailable cars{" "}
+      </p>
+      <h2>Unsolved reports:</h2>
       {damageReports ? (
-        <div>
+        <div className="damage-report-container">
           {damageReports
             .filter((report) => report.status === "pending")
             .map((report) => (
@@ -130,10 +136,11 @@ export default function DamageReports() {
         <p>No damage reports available</p>
       )}
       <hr />
+
       <h2>Solved reports:</h2>
       <div>
         {damageReports ? (
-          <div>
+          <div className="damage-report-container">
             {damageReports
               .filter((report) => report.status === "resolved")
               .map((report) => (
@@ -142,19 +149,30 @@ export default function DamageReports() {
                   <p>Damage report: {report.issueType}</p>
                   <p>Description: {report.description}</p>
                   <p>
-                    Aviability:{" "}
-                    {report.damaged ? "Currently available " : "Not aviable"}
+                    Availability:{" "}
+                    {report.available ? "Currently available" : "Not available"}
                   </p>
                   <p>Created at: {report.createdAt}</p>
-                  <p>Reported by: {report.userName}</p>
-                  <button
-                    onClick={() => {
-                      setDeleteReportModal(true);
-                      setDeleteReport(report);
-                    }}
-                  >
-                    Delete report
-                  </button>
+                  <div style={{ display: "flex", gap: "10px" }}>
+                    <button
+                      onClick={() => {
+                        setDeleteReportModal(true);
+                        setDeleteReport(report);
+                      }}
+                    >
+                      Delete report
+                    </button>
+                    {!report.available && (
+                      <button
+                        onClick={() => {
+                          setMakeCarAvailableModal(true);
+                          setCarToMakeAvailable(report);
+                        }}
+                      >
+                        Make car available
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
           </div>
@@ -162,6 +180,25 @@ export default function DamageReports() {
           <p>No solved reports</p>
         )}
       </div>
+
+      {/* React Modal for Making Car Available */}
+      <ReactModal
+        isOpen={makeCarAvailableModal}
+        onRequestClose={() => setMakeCarAvailableModal(false)}
+        className="modal"
+        overlayClassName="modal-overlay"
+      >
+        <h2>Confirm Action</h2>
+        <p style={{ color: "black" }}>
+          Are you sure you want to make the car <strong>available</strong>{" "}
+          again?
+        </p>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button onClick={handleMakeCarAvailable}>Yes</button>
+          <button onClick={() => setMakeCarAvailableModal(false)}>No</button>
+        </div>
+      </ReactModal>
+
       {unavailableCarModal && (
         <CarAviabilityModal
           setUnavailableCarModal={setUnavailableCarModal}

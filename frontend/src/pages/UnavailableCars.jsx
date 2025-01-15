@@ -1,8 +1,12 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import ReactModal from "react-modal";
+
+ReactModal.setAppElement("#root");
 
 export default function UnavailableCars() {
-  const [unavailableCars, setUnavailableCars] = useState(null);
+  const [unavailableCars, setUnavailableCars] = useState([]);
+  const [selectedCar, setSelectedCar] = useState(null);
   const [modal, setModal] = useState(false);
 
   useEffect(() => {
@@ -10,18 +14,40 @@ export default function UnavailableCars() {
       console.log(res.data);
       setUnavailableCars(res.data);
     });
-  });
+  }, []);
+
+  const handleMakeAvailable = () => {
+    if (!selectedCar) return;
+    axios
+      .patch(`http://localhost:3000/cars/${selectedCar._id}`, {
+        aviability: true,
+      })
+      .then(() => {
+        setModal(false);
+        window.location.reload(); // Reload the page
+      })
+      .catch((err) => {
+        console.error("Error making car available:", err);
+      });
+  };
 
   return (
-    <div className="user-page">
-      <h1>Unavailable cars:</h1>
+    <div className="pages">
+      <h1>Unavailable Cars:</h1>
       <div>
-        {unavailableCars ? (
-          <div>
+        {unavailableCars.length > 0 ? (
+          <div style={{ display: "flex", gap: "10px" }}>
             {unavailableCars.map((car) => (
-              <div key={car.id} className="request-div-renting">
-                <p>Car: {car.brand}</p>
-                <button onClick={() => setModal(true)}>
+              <div key={car._id} className="unavailable-cars">
+                <p>
+                  <strong>{car.brand}</strong>
+                </p>
+                <button
+                  onClick={() => {
+                    setSelectedCar(car);
+                    setModal(true);
+                  }}
+                >
                   Make car available
                 </button>
               </div>
@@ -31,6 +57,21 @@ export default function UnavailableCars() {
           <p>No unavailable cars.</p>
         )}
       </div>
+
+      {/* Modal for Confirming Action */}
+      <ReactModal
+        isOpen={modal}
+        onRequestClose={() => setModal(false)}
+        className="modal"
+        overlayClassName="modal-overlay"
+      >
+        <h2>Make Car Available</h2>
+        <p>Are you sure you want to make this car available?</p>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button onClick={handleMakeAvailable}>Yes</button>
+          <button onClick={() => setModal(false)}>No</button>
+        </div>
+      </ReactModal>
     </div>
   );
 }

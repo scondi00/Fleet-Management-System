@@ -58,9 +58,13 @@ export default function HomePage() {
   return (
     <div>
       {!checkReqPage ? (
-        <div className="user-page">
+        <div className="pages">
           <h1>Admin Page</h1>
           <p>Welcome to administration page.</p>
+          <p>
+            Here you can see currently pending requests. You can either deny
+            them or asign available cars.
+          </p>
           <h2>Pending Requests</h2>
           {pendingRequests.length > 0 ? (
             <div className="requests-container">

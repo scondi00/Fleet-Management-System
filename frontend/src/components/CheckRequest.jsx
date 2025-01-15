@@ -92,6 +92,7 @@ export default function CheckRequest({ setCheckReqPage, checkRequest }) {
       <div style={{ display: "flex" }}>
         <div style={{ marginRight: "60px" }}>
           <h2>Check request for:</h2>
+          <hr />
           <p>
             <strong>Employee name:</strong> {checkRequest.name}
           </p>
@@ -101,6 +102,7 @@ export default function CheckRequest({ setCheckReqPage, checkRequest }) {
         </div>
         <div>
           <h2>Specific requests:</h2>
+          <hr />
           <p>
             <strong>Car type:</strong> {checkRequest.carType}
           </p>
@@ -118,19 +120,24 @@ export default function CheckRequest({ setCheckReqPage, checkRequest }) {
       <i>*Including specific car type</i>
       <div>
         {message && <p>{message}</p>}
-        {availableCars && (
+        {availableCars ? (
           <div style={{ display: "flex" }}>
             {availableCars.map((car, index) => (
               <div key={index} className="available-cars-div">
                 <h4>{car.brand}</h4>
                 <p>{car.fuel}</p>
                 <p>{car.MA_transmission}</p>
-                <button onClick={() => approveRequest(car)}>
+                <button
+                  onClick={() => approveRequest(car)}
+                  style={{ backgroundColor: "#646cff" }}
+                >
                   Approve request
                 </button>
               </div>
             ))}
           </div>
+        ) : (
+          <p>There are no available cars.</p>
         )}
       </div>
 

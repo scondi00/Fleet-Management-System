@@ -8,13 +8,18 @@ export default function FixProblemModal({ setFixProblemModal, fixProblem }) {
       })
       .then((res) => {
         console.log(res.data);
+        return axios.patch(
+          `http://localhost:3000/issue-reports/${fixProblem._id}`,
+          {
+            status: "resolved",
+          }
+        );
+      })
+      .then((res) => {
+        console.log("Issue report updated:", res.data);
         setFixProblemModal(false);
       })
-      .catch((err) => console.log(err));
-
-    axios.patch(`http://localhost:3000/issue-reports/${fixProblem._id}`, {
-      status: "resolved",
-    });
+      .catch((err) => console.error("Error updating data:", err));
   };
 
   return (
@@ -27,7 +32,7 @@ export default function FixProblemModal({ setFixProblemModal, fixProblem }) {
           X
         </button>
         <h3>Damaged was fixed </h3>
-        <p>Was the damage on the report fixed?</p>
+        <p>Was the reported car problem fixed ?</p>
         <button onClick={() => handleFixProblem()}>Yes.</button>
       </div>
     </div>

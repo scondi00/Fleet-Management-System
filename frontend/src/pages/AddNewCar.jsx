@@ -37,7 +37,7 @@ export default function AddNewCar() {
   };
 
   return (
-    <div className="user-page">
+    <div className="pages">
       <h1>Add New Car</h1>
       <form onSubmit={handleSubmit}>
         {/* Brand Input */}

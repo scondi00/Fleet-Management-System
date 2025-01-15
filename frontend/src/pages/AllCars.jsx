@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Calendar from "react-calendar"; // Install using `npm install react-calendar`
+import ReactModal from "react-modal";
 import "../CalendarStyles.css";
+
+ReactModal.setAppElement("#root"); // Set app element for accessibility
 
 export default function AllCars() {
   const [allCars, setAllCars] = useState([]);
   const [selectedCar, setSelectedCar] = useState(null);
+  const [actionModal, setActionModal] = useState(false);
+  const [actionType, setActionType] = useState("");
 
   useEffect(() => {
     axios.get("http://localhost:3000/cars").then((res) => {
@@ -17,9 +22,25 @@ export default function AllCars() {
     setSelectedCar(car);
   };
 
+  const handleActionConfirm = () => {
+    const isAvailable = actionType === "make-available";
+    axios
+      .patch(`http://localhost:3000/cars/${selectedCar._id}`, {
+        aviability: isAvailable,
+      })
+      .then(() => {
+        setActionModal(false);
+        window.location.reload(); // Reload the page
+      })
+      .catch((err) => {
+        console.error("Error updating car availability:", err);
+      });
+  };
+
   return (
-    <div>
+    <div className="pages">
       <h1>All Cars</h1>
+
       {/* Horizontal List */}
       <div className="car-list">
         {allCars.map((car) => (
@@ -46,15 +67,34 @@ export default function AllCars() {
           </p>
           <p>
             <strong>Damaged:</strong> {selectedCar.damaged ? "Yes" : "No"}
-            <p>
-              <strong>Available:</strong>{" "}
-              {selectedCar.aviability.isAvailable ? "Yes" : "No"}
-            </p>
           </p>
+          <p>
+            <strong>Available:</strong> {selectedCar.aviability ? "Yes" : "No"}
+          </p>
+
+          {/* Button to Toggle Availability */}
+          {selectedCar.aviability ? (
+            <button
+              onClick={() => {
+                setActionType("make-unavailable");
+                setActionModal(true);
+              }}
+            >
+              Make Car Unavailable
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                setActionType("make-available");
+                setActionModal(true);
+              }}
+            >
+              Make Car Available
+            </button>
+          )}
 
           {/* Calendar with Reservations */}
           <h3>Reservations:</h3>
-
           <Calendar
             tileContent={({ date }) => {
               const formattedDate = date.toISOString().split("T")[0];
@@ -72,6 +112,31 @@ export default function AllCars() {
           />
         </div>
       )}
+
+      {/* Modal for Confirming Action */}
+      <ReactModal
+        isOpen={actionModal}
+        onRequestClose={() => setActionModal(false)}
+        className="modal"
+        overlayClassName="modal-overlay"
+      >
+        <h2>
+          {actionType === "make-unavailable"
+            ? "Make Car Unavailable"
+            : "Make Car Available"}
+        </h2>
+        <p>
+          Are you sure you want to{" "}
+          {actionType === "make-unavailable"
+            ? "make this car unavailable"
+            : "make this car available"}
+          ?
+        </p>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button onClick={handleActionConfirm}>Yes</button>
+          <button onClick={() => setActionModal(false)}>No</button>
+        </div>
+      </ReactModal>
     </div>
   );
 }
