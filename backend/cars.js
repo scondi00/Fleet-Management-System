@@ -79,7 +79,8 @@ router.get("/available", async (req, res) => {
 
 router.get("/unavailable", async (req, res) => {
   try {
-    const damagedCars = await Car.find({ available: false });
+    const damagedCars = await Car.find({ aviability: false });
+
     res.status(200).json(damagedCars);
   } catch (err) {
     console.log(err);
