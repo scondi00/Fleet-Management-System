@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const router = express.Router();
+const { checkToken } = require("./middlewares");
 
 const { Schema } = mongoose;
 
@@ -19,7 +20,7 @@ const IssueReport = mongoose.model(
   "issue-reports"
 );
 
-router.get("/", async (req, res) => {
+router.get("/", checkToken, async (req, res) => {
   try {
     const reports = await IssueReport.find();
     res.status(200).json(reports);
@@ -28,7 +29,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", checkToken, async (req, res) => {
   const newReport = new IssueReport(req.body);
   try {
     await newReport.save();
@@ -38,7 +39,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", checkToken, async (req, res) => {
   const { id } = req.params;
   try {
     // Find and delete the report by its ID
@@ -57,7 +58,7 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json({ message: "An error occurred", error });
   }
 });
-router.patch("/:reportId", async (req, res) => {
+router.patch("/:reportId", checkToken, async (req, res) => {
   const { reportId } = req.params;
   const updates = req.body;
 

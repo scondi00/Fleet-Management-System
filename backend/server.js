@@ -6,28 +6,18 @@ const jwt = require("jsonwebtoken");
 const userRequestsRouter = require("./user-requests");
 const issueReportsRouter = require("./issue-reports");
 const carsRouter = require("./cars");
+const usersRouter = require("./users");
 const { checkToken } = require("./middlewares");
+const User = require("./user.model");
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-const { Schema } = mongoose;
-const userShema = new Schema({
-  name: String,
-  email: { type: String, required: true },
-  password: { type: String, required: true },
-  role: { type: String, required: true },
-});
-
-const User = mongoose.model("User", userShema, "users");
-
 mongoose.connect("mongodb://127.0.0.1:27017/carParkDb", { family: 4 });
 
-// Instanca konekcije na bazu
 const db = mongoose.connection;
 
-// Upravljanje događajima
 db.on("error", (error) => {
   console.error("Error with connection:", error);
 });
@@ -42,29 +32,7 @@ app.get("/", (req, res) => {
 app.use("/user-requests", userRequestsRouter);
 app.use("/cars", carsRouter);
 app.use("/issue-reports", issueReportsRouter);
-
-app.get("/user", checkToken, async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id);
-
-    if (!user) return res.status(404).send("User not found");
-
-    res.status(200).json(user);
-  } catch (err) {
-    res.status(500).send("Error retrieving user data");
-  }
-});
-app.get("/user/:userId", async (req, res) => {
-  try {
-    const user = await User.findById(req.params.userId);
-    if (!user) {
-      return res.status(404).json({ message: "Car not found" });
-    }
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching car details", error });
-  }
-});
+app.use("/users", usersRouter);
 
 const saltRunde = 10;
 app.post("/register", async (req, res) => {

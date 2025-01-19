@@ -23,12 +23,12 @@ router.get("/my-requests", checkToken, async (req, res) => {
 });
 
 // Get all requests for admin
-router.get("/all-requests", async (req, res) => {
+router.get("/all-requests", checkToken, async (req, res) => {
   const userRequests = await UserRequest.find({ status: "pending" }).populate();
   res.status(200).json(userRequests);
 });
 
-router.patch("/deny-request", async (req, res) => {
+router.patch("/deny-request", checkToken, async (req, res) => {
   try {
     const userRequest = await UserRequest.findByIdAndUpdate(req.body.req_id, {
       status: req.body.status,
@@ -44,7 +44,7 @@ router.patch("/deny-request", async (req, res) => {
   }
 });
 
-router.patch("/approve-request", async (req, res) => {
+router.patch("/approve-request", checkToken, async (req, res) => {
   const { req_id, status, car_id } = req.body;
 
   // Validate incoming data

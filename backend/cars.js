@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const UserRequest = require("./user-request.model");
 const router = express.Router();
+const { checkToken } = require("./middlewares");
 
 const { Schema } = mongoose;
 const { ObjectId } = mongoose.Types;
@@ -12,6 +13,7 @@ const CarSchema = new Schema({
   fuel: { type: String, required: true },
   MA_transmission: { type: String, required: true },
   damaged: { type: Boolean, default: false },
+  damageReport: { type: String, default: "" },
   aviability: { type: Boolean, default: true },
   reservations: [
     {
@@ -33,7 +35,7 @@ const CarSchema = new Schema({
 const Car = mongoose.model("Car", CarSchema, "cars");
 
 // filter cars by type and start and end time
-router.get("/available", async (req, res) => {
+router.get("/available", checkToken, async (req, res) => {
   const { carType, startDate, endDate } = req.query;
 
   if (!carType || !startDate || !endDate) {
@@ -42,7 +44,7 @@ router.get("/available", async (req, res) => {
 
   try {
     // first find cars by car type
-    const cars = await Car.find({ carType, "aviability.isAvailable": true });
+    const cars = await Car.find({ carType, aviability: true });
 
     if (cars.length === 0) {
       console.log(`No cars with car type: ${carType}`);
@@ -77,7 +79,7 @@ router.get("/available", async (req, res) => {
   }
 });
 
-router.get("/unavailable", async (req, res) => {
+router.get("/unavailable", checkToken, async (req, res) => {
   try {
     const damagedCars = await Car.find({ aviability: false });
 
@@ -90,7 +92,7 @@ router.get("/unavailable", async (req, res) => {
   }
 });
 
-router.patch("/approve", async (req, res) => {
+router.patch("/approve", checkToken, async (req, res) => {
   const { startDate, endDate, requester_id, request_id, car_id } = req.body;
 
   if (!startDate || !endDate || !requester_id || !car_id || !request_id) {
@@ -121,7 +123,7 @@ router.patch("/approve", async (req, res) => {
   }
 });
 
-router.delete("/delete-pending-req", async (req, res) => {
+router.delete("/delete-pending-req", checkToken, async (req, res) => {
   const { reservation_id } = req.body;
   if (!reservation_id) {
     return res.status(400).json({ message: "Missing required fields." });
@@ -151,7 +153,7 @@ router.delete("/delete-pending-req", async (req, res) => {
   }
 });
 
-router.delete("/delete-approved-req", async (req, res) => {
+router.delete("/delete-approved-req", checkToken, async (req, res) => {
   const { car_id, reservation_id } = req.body;
 
   if (!car_id || !reservation_id) {
@@ -198,7 +200,7 @@ router.delete("/delete-approved-req", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", checkToken, async (req, res) => {
   try {
     const newCar = new Car(req.body);
     await newCar.save();
@@ -208,7 +210,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.get("/", async (req, res) => {
+router.get("/", checkToken, async (req, res) => {
   try {
     const cars = await Car.find();
     res.status(200).json(cars);
@@ -218,7 +220,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/:carId", async (req, res) => {
+router.get("/:carId", checkToken, async (req, res) => {
   try {
     const car = await Car.findById(req.params.carId);
     if (!car) {
@@ -229,7 +231,7 @@ router.get("/:carId", async (req, res) => {
     res.status(500).json({ message: "Error fetching car details", error });
   }
 });
-router.patch("/:carId", async (req, res) => {
+router.patch("/:carId", checkToken, async (req, res) => {
   const { carId } = req.params;
   const updates = req.body;
 
