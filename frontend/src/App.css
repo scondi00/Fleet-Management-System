@@ -18,6 +18,38 @@
   margin-left: 300px;
 }
 
+/* USER PAGE */
+.scrollable-container {
+  width: 100%; /* Full width of the screen or parent container */
+  overflow-x: auto; /* Enable horizontal scrolling */
+  padding: 10px;
+  white-space: nowrap; /* Prevent cards from wrapping */
+}
+
+.scrollable-content {
+  display: inline-flex; /* Align cards horizontally */
+  gap: 20px; /* Space between cards */
+}
+
+.card {
+  flex: none; /* Prevent cards from stretching */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  border: 1px solid #b6881e;
+  padding: 30px;
+  width: 200px; /* Adjust card width */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Optional: Hide the scrollbar for a cleaner look */
+.scrollable-container::-webkit-scrollbar {
+  display: none; /* Hide scrollbar on WebKit browsers */
+}
+.scrollable-container {
+  -ms-overflow-style: none; /* Hide scrollbar on IE and Edge */
+  scrollbar-width: none; /* Hide scrollbar on Firefox */
+}
+
 /* REQUEST FORM */
 
 .start_end_date_picker_container {
@@ -104,7 +136,6 @@
   border: 1px solid #cebb3e;
   text-align: left;
   padding: 10px;
-  width: 20%;
 }
 .request-div-denied {
   flex-direction: column;
@@ -112,15 +143,14 @@
   border: 1px solid #ec3636;
   text-align: left;
   padding: 10px;
-  width: 20%;
 }
 .request-div-approved {
   flex-direction: column;
   border-radius: 8px;
   border: 1px solid #31bf44;
   text-align: left;
-  padding: 10px;
-  width: 20%;
+  padding: 20px;
+  align-items: self-end;
 }
 .request-div-renting {
   flex-direction: column;
@@ -130,16 +160,20 @@
   padding: 10px;
   width: 20%;
 }
+
 .requests-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two equal columns */
+  gap: 20px;
 }
-.requests-container {
+
+.requests-container-available {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  width: 2000px;
+  gap: 20px;
+}
+.requests-container-denied {
+  display: flex;
+  gap: 20px;
 }
 
 /* unavailable cars */

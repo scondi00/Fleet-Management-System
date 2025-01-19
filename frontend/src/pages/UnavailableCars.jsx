@@ -10,18 +10,31 @@ export default function UnavailableCars() {
   const [modal, setModal] = useState(false);
 
   useEffect(() => {
-    axios.get("http://localhost:3000/cars/unavailable").then((res) => {
-      console.log(res.data);
-      setUnavailableCars(res.data);
-    });
+    const token = localStorage.getItem("token");
+    axios
+      .get("http://localhost:3000/cars/unavailable", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setUnavailableCars(res.data);
+      });
   }, []);
 
   const handleMakeAvailable = () => {
     if (!selectedCar) return;
+    const token = localStorage.getItem("token");
     axios
-      .patch(`http://localhost:3000/cars/${selectedCar._id}`, {
-        aviability: true,
-      })
+      .patch(
+        `http://localhost:3000/cars/${selectedCar._id}`,
+        {
+          aviability: true,
+          damageReport: "",
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
       .then(() => {
         setModal(false);
         window.location.reload(); // Reload the page
@@ -41,6 +54,10 @@ export default function UnavailableCars() {
               <div key={car._id} className="unavailable-cars">
                 <p>
                   <strong>{car.brand}</strong>
+                </p>
+                <p>
+                  <strong>Report:</strong>
+                  <p>{car.damageReport}</p>
                 </p>
                 <button
                   onClick={() => {
@@ -67,6 +84,7 @@ export default function UnavailableCars() {
       >
         <h2>Make Car Available</h2>
         <p>Are you sure you want to make this car available?</p>
+        <p>If yes, the report will also be considered as resolved.</p>
         <div style={{ display: "flex", gap: "10px" }}>
           <button onClick={handleMakeAvailable}>Yes</button>
           <button onClick={() => setModal(false)}>No</button>

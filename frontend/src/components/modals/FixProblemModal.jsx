@@ -2,16 +2,26 @@ import axios from "axios";
 
 export default function FixProblemModal({ setFixProblemModal, fixProblem }) {
   const handleFixProblem = () => {
+    const token = localStorage.getItem("token");
     axios
-      .patch(`http://localhost:3000/cars/${fixProblem.carId}`, {
-        damaged: false,
-      })
+      .patch(
+        `http://localhost:3000/cars/${fixProblem.carId}`,
+        {
+          damaged: false,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
       .then((res) => {
         console.log(res.data);
         return axios.patch(
           `http://localhost:3000/issue-reports/${fixProblem._id}`,
           {
             status: "resolved",
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
           }
         );
       })

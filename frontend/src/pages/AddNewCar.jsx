@@ -11,6 +11,7 @@ export default function AddNewCar() {
     carType: "standard",
     fuel: "Diesel",
     MA_transmission: "Manual",
+    imagePath: "",
   });
 
   const [successModal, setSuccessModal] = useState(false);
@@ -22,8 +23,11 @@ export default function AddNewCar() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const token = localStorage.getItem("token");
     axios
-      .post("http://localhost:3000/cars", newCar)
+      .post("http://localhost:3000/cars", newCar, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((res) => {
         console.log(res);
         setSuccessModal(true); // Show success modal

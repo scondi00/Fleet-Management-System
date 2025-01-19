@@ -11,11 +11,17 @@ export default function AllCars() {
   const [selectedCar, setSelectedCar] = useState(null);
   const [actionModal, setActionModal] = useState(false);
   const [actionType, setActionType] = useState("");
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:3000/cars").then((res) => {
-      setAllCars(res.data);
-    });
+    const token = localStorage.getItem("token");
+    axios
+      .get("http://localhost:3000/cars", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        setAllCars(res.data);
+      });
   }, []);
 
   const handleCarClick = (car) => {
@@ -23,11 +29,19 @@ export default function AllCars() {
   };
 
   const handleActionConfirm = () => {
+    const token = localStorage.getItem("token");
     const isAvailable = actionType === "make-available";
     axios
-      .patch(`http://localhost:3000/cars/${selectedCar._id}`, {
-        aviability: isAvailable,
-      })
+      .patch(
+        `http://localhost:3000/cars/${selectedCar._id}`,
+        {
+          aviability: isAvailable,
+          damageReport: description,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
       .then(() => {
         setActionModal(false);
         window.location.reload(); // Reload the page
@@ -66,11 +80,22 @@ export default function AllCars() {
             {selectedCar.MA_transmission}
           </p>
           <p>
-            <strong>Damaged:</strong> {selectedCar.damaged ? "Yes" : "No"}
+            <strong>Reported damage:</strong>{" "}
+            {selectedCar.damaged ? "Yes" : "No"}
           </p>
           <p>
             <strong>Available:</strong> {selectedCar.aviability ? "Yes" : "No"}
           </p>
+          {selectedCar.aviability ? (
+            ""
+          ) : (
+            <div>
+              <p>
+                <strong>Report:</strong>
+                <p>{selectedCar.damageReport}</p>
+              </p>
+            </div>
+          )}
 
           {/* Button to Toggle Availability */}
           {selectedCar.aviability ? (
@@ -87,6 +112,7 @@ export default function AllCars() {
               onClick={() => {
                 setActionType("make-available");
                 setActionModal(true);
+                setDescription("");
               }}
             >
               Make Car Available
@@ -113,7 +139,6 @@ export default function AllCars() {
         </div>
       )}
 
-      {/* Modal for Confirming Action */}
       <ReactModal
         isOpen={actionModal}
         onRequestClose={() => setActionModal(false)}
@@ -132,9 +157,38 @@ export default function AllCars() {
             : "make this car available"}
           ?
         </p>
+        <p>
+          {" "}
+          {actionType === "make-unavailable" ? (
+            <div>
+              <p>Please enter reason for making the car unavailable:</p>
+              <div style={{ marginBottom: "15px" }}>
+                <label htmlFor="description">Description</label>
+                <br />
+                <textarea
+                  id="description"
+                  name="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Describe the issue in detail"
+                  required
+                  style={{
+                    width: "90%",
+                    padding: "10px",
+                    marginTop: "5px",
+                    height: "100px",
+                    resize: "vertical",
+                  }}
+                />
+              </div>
+            </div>
+          ) : (
+            ""
+          )}
+        </p>
         <div style={{ display: "flex", gap: "10px" }}>
-          <button onClick={handleActionConfirm}>Yes</button>
-          <button onClick={() => setActionModal(false)}>No</button>
+          <button onClick={handleActionConfirm}>Confirm</button>
+          <button onClick={() => setActionModal(false)}>Cancel</button>
         </div>
       </ReactModal>
     </div>

@@ -1,17 +1,25 @@
 import axios from "axios";
+import { useState } from "react";
 
 export default function CarAviabilityModal({
   setUnavailableCarModal,
   unavailableCar,
 }) {
+  const [damageReport, setDamageReport] = useState("");
   const makeCarUnavailable = () => {
+    const token = localStorage.getItem("token");
     axios
-      .patch(`http://localhost:3000/cars/${unavailableCar.carId}`, {
-        aviability: {
-          isAvailable: false,
+      .patch(
+        `http://localhost:3000/cars/${unavailableCar.carId}`,
+        {
+          aviability: false,
+          damaged: true,
+          damageReport: damageReport,
         },
-        damaged: true,
-      })
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
       .then((res) => {
         console.log(res.data);
         setUnavailableCarModal(false);
@@ -28,8 +36,27 @@ export default function CarAviabilityModal({
           X
         </button>
         <h3>Make the {unavailableCar.carBrand} unavailable</h3>
-        <p>Are you sure you want to report car as damaged and unavailable?</p>
-        <button onClick={() => makeCarUnavailable()}>Yes.</button>
+        <p>Please write the reason for making the car unavailable.</p>
+        <div style={{ marginBottom: "15px" }}>
+          <label htmlFor="description">Description</label>
+          <br />
+          <textarea
+            id="description"
+            name="description"
+            value={damageReport}
+            onChange={(e) => setDamageReport(e.target.value)}
+            placeholder="Describe the issue in detail"
+            required
+            style={{
+              width: "480px",
+              padding: "10px",
+              marginTop: "5px",
+              height: "100px",
+              resize: "vertical",
+            }}
+          />
+        </div>
+        <button onClick={() => makeCarUnavailable()}>Make unavailable.</button>
       </div>
     </div>
   );

@@ -30,9 +30,12 @@ export default function HomePage() {
   }, [refresh]);
 
   const denyRequest = (request) => {
+    const token = localStorage.getItem("token");
     const updated_req = { req_id: request._id, status: "denied" };
     axios
-      .patch("http://localhost:3000/user-requests/deny-request", updated_req)
+      .patch("http://localhost:3000/user-requests/deny-request", updated_req, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((response) => {
         console.log(response.data);
         setRefresh(!refresh);

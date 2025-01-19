@@ -35,7 +35,7 @@ export default function UserHistoryPage() {
     const token = localStorage.getItem("token");
     if (token) {
       axios
-        .get("http://localhost:3000/user", {
+        .get("http://localhost:3000/users", {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
@@ -59,7 +59,10 @@ export default function UserHistoryPage() {
             checkIfPastRequests(request.endDate)
           ) {
             const carResponse = await axios.get(
-              `http://localhost:3000/cars/${request.assigned_car_id}`
+              `http://localhost:3000/cars/${request.assigned_car_id}`,
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
             );
             return { ...request, brand: carResponse.data.brand };
           } else if (request.status === "denied") {
@@ -87,7 +90,7 @@ export default function UserHistoryPage() {
       <h1>My history:</h1>
       <h2>Past approved requests:</h2>
       {approvedRequests ? (
-        <div className="requests-container">
+        <div className="requests-container-available">
           {approvedRequests.map((req) => (
             <div key={req.id} className="request-div-approved">
               <p>
@@ -122,7 +125,7 @@ export default function UserHistoryPage() {
       <hr />
       <h2>Denied requests:</h2>
       {deniedRequests.length > 0 ? (
-        <div className="requests-container">
+        <div className="requests-container-denied">
           {deniedRequests.map((request) => (
             <div key={request.id} className="request-div-denied">
               <p>

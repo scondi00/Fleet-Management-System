@@ -12,9 +12,11 @@ export default function DeleteReportModal({
   const handleDelete = () => {
     setLoading(true);
     setError(null);
-
+    const token = localStorage.getItem("token");
     axios
-      .delete(`http://localhost:3000/issue-reports/${deleteReport._id}`)
+      .delete(`http://localhost:3000/issue-reports/${deleteReport._id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((res) => {
         console.log(res.data.message);
         setLoading(false);

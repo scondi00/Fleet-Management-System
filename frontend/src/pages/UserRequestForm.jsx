@@ -24,7 +24,7 @@ export default function UserRequestForm() {
     const token = localStorage.getItem("token");
     if (token) {
       axios
-        .get("http://localhost:3000/user", {
+        .get("http://localhost:3000/users", {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
@@ -86,7 +86,7 @@ export default function UserRequestForm() {
           },
         }
       );
-      setModalMessage("Your reservation was successful!");
+      setModalMessage("Your request was successfully sent!");
     } catch (error) {
       setModalMessage(
         error.response?.data || "An error occurred while submitting the request"

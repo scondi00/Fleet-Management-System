@@ -36,7 +36,7 @@ export default function UserPage() {
     const token = localStorage.getItem("token");
     if (token) {
       axios
-        .get("http://localhost:3000/user", {
+        .get("http://localhost:3000/users", {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
@@ -80,7 +80,7 @@ export default function UserPage() {
       .catch((error) => {
         console.error("Error fetching user requests:", error);
       });
-  }, []);
+  }, [modal]);
 
   if (!user) {
     return <p>Loading...</p>;
@@ -132,34 +132,38 @@ export default function UserPage() {
       )}
       <hr />
       <h3>Pending requests:</h3>
-      {pendingRequests.length > 0 ? (
-        <div className="requests-container">
-          {pendingRequests.map((request) => (
-            <div key={request.id} className="request-div-pending">
-              <p>
-                <strong>Car type:</strong> {request.carType}
-              </p>
-              <p>
-                <strong>Reason: </strong>
-                {request.reason}
-              </p>
-              <p>
-                <strong>Start Date: </strong>
-                {formatDateTime(request.startDate)}
-              </p>
-              <p>
-                <strong>End Date:</strong> {formatDateTime(request.endDate)}
-              </p>
-              <p>
-                <strong>Status:</strong> {request.status}
-              </p>
-              <button onClick={() => openModal(request)}>Cancel request</button>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p>No pending requests</p>
-      )}
+      <div className="scrollable-container">
+        {pendingRequests.length > 0 ? (
+          <div className="scrollable-content">
+            {pendingRequests.map((request) => (
+              <div key={request.id} className="card">
+                <p>
+                  <strong>Car type:</strong> {request.carType}
+                </p>
+                <p>
+                  <strong>Reason: </strong>
+                  {request.reason}
+                </p>
+                <p>
+                  <strong>Start Date: </strong>
+                  {formatDateTime(request.startDate)}
+                </p>
+                <p>
+                  <strong>End Date:</strong> {formatDateTime(request.endDate)}
+                </p>
+                <p>
+                  <strong>Status:</strong> {request.status}
+                </p>
+                <button onClick={() => openModal(request)}>
+                  Cancel request
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p>No pending requests</p>
+        )}
+      </div>
       <hr />
       <h4>Upcoming approved:</h4>
       {approvedRequests.length > 0 ? (

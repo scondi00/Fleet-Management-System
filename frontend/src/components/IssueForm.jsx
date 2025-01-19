@@ -13,8 +13,11 @@ export default function IssueForm({ setModal, problemReq }) {
   });
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
     axios
-      .get(`http://localhost:3000/cars/${problemReq.assigned_car_id}`)
+      .get(`http://localhost:3000/cars/${problemReq.assigned_car_id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((res) => {
         setCar(res.data);
         setFormData({
@@ -31,11 +34,16 @@ export default function IssueForm({ setModal, problemReq }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post("http://localhost:3000/issue-reports", formData).then((res) => {
-      if (res.data === "Report successfully added to database") {
-        setSuccessMessage("Issue reported successfully!");
-      }
-    });
+    const token = localStorage.getItem("token");
+    axios
+      .post("http://localhost:3000/issue-reports", formData, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        if (res.data === "Report successfully added to database") {
+          setSuccessMessage("Issue reported successfully!");
+        }
+      });
   };
 
   return (

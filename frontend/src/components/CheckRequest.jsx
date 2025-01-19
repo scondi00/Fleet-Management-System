@@ -9,8 +9,12 @@ export default function CheckRequest({ setCheckReqPage, checkRequest }) {
   const [modalMsg, setModalMsg] = useState(null);
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+
     axios
       .get("http://localhost:3000/cars/available", {
+        headers: { authorization: `Bearer ${token}` },
+
         params: {
           carType: checkRequest.carType,
           startDate: checkRequest.startDate,
@@ -33,21 +37,35 @@ export default function CheckRequest({ setCheckReqPage, checkRequest }) {
   }, [checkRequest]);
 
   const approveRequest = (car) => {
+    const token = localStorage.getItem("token");
+
     axios
-      .patch("http://localhost:3000/cars/approve", {
-        startDate: checkRequest.startDate,
-        endDate: checkRequest.endDate,
-        requester_id: checkRequest.requester,
-        request_id: checkRequest._id,
-        car_id: car._id,
-      })
+      .patch(
+        "http://localhost:3000/cars/approve",
+        {
+          startDate: checkRequest.startDate,
+          endDate: checkRequest.endDate,
+          requester_id: checkRequest.requester,
+          request_id: checkRequest._id,
+          car_id: car._id,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
       .then(() => {
         axios
-          .patch("http://localhost:3000/user-requests/approve-request", {
-            req_id: checkRequest._id,
-            status: "approved",
-            car_id: car._id,
-          })
+          .patch(
+            "http://localhost:3000/user-requests/approve-request",
+            {
+              req_id: checkRequest._id,
+              status: "approved",
+              car_id: car._id,
+            },
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          )
           .then(() => {
             setModalMsg("Request successfully approved!");
             setModal(true);
