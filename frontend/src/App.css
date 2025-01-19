@@ -19,6 +19,12 @@
 }
 
 /* USER PAGE */
+
+.requests {
+  display: flex;
+  gap: 15px;
+}
+
 .scrollable-container {
   width: 100%; /* Full width of the screen or parent container */
   overflow-x: auto; /* Enable horizontal scrolling */
@@ -32,7 +38,7 @@
 }
 
 .card {
-  flex: none; /* Prevent cards from stretching */
+  flex: none;
   border: 1px solid #ccc;
   border-radius: 8px;
   border: 1px solid #b6881e;
@@ -129,9 +135,12 @@
 }
 
 /* Requests */
+.requests-pending-container {
+  display: flex;
+  gap: 10px;
+}
 
 .request-div-pending {
-  flex-direction: column;
   border-radius: 8px;
   border: 1px solid #cebb3e;
   text-align: left;
@@ -145,7 +154,6 @@
   padding: 10px;
 }
 .request-div-approved {
-  flex-direction: column;
   border-radius: 8px;
   border: 1px solid #31bf44;
   text-align: left;
@@ -153,12 +161,10 @@
   align-items: self-end;
 }
 .request-div-renting {
-  flex-direction: column;
   border-radius: 8px;
   border: 1px solid #bf31b6;
   text-align: left;
   padding: 10px;
-  width: 20%;
 }
 
 .requests-container {

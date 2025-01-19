@@ -7,56 +7,54 @@ export default function UserPage() {
   const [user, setUser] = useState(null);
   const [pendingRequests, setPendingRequests] = useState([]);
   const [approvedRequests, setApprovedRequests] = useState([]);
-  const [currentlyRenting, setCurrentlyRentinge] = useState([]);
+  const [currentlyRenting, setCurrentlyRenting] = useState([]);
   const [modal, setModal] = useState(false);
   const [cancelReq, setCancelReq] = useState(null);
 
   const checkIfCurrentlyRenting = (startDate, endDate) => {
-    // Get the current date
     const currentDate = new Date();
-
-    // Convert startDate and endDate to Date objects
     const start = new Date(startDate);
     const end = new Date(endDate);
-
-    // Check if the current date is between startDate and endDate (inclusive)
     return currentDate >= start && currentDate <= end;
   };
+
   const checkIfDateIsPassed = (endDate) => {
-    // Get the current date
     const currentDate = new Date();
-
     const end = new Date(endDate);
-
-    // Check if the current date is after the endDate
     return currentDate >= end;
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      axios
-        .get("http://localhost:3000/users", {
+    const fetchUserData = async () => {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        console.error("No token found");
+        return;
+      }
+
+      try {
+        const decodedToken = jwtDecode(token);
+
+        // Fetch user data
+        const userResponse = await axios.get("http://localhost:3000/users", {
           headers: { Authorization: `Bearer ${token}` },
-        })
-        .then((response) => {
-          setUser(response.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching user data:", error);
         });
-    }
-    const decodedToken = jwtDecode(token);
-    const { id, role } = decodedToken;
-    axios
-      .get(`http://localhost:3000/user-requests/my-requests`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
+        setUser(userResponse.data);
+
+        // Fetch user requests
+        const requestsResponse = await axios.get(
+          "http://localhost:3000/user-requests/my-requests",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
         const pending = [];
-        const approved = [];
-        const renting = [];
-        response.data.forEach((request) => {
+        const approvedWithoutCarDetails = [];
+        const rentingWithoutCarDetails = [];
+
+        requestsResponse.data.forEach((request) => {
           if (request.status === "pending") {
             pending.push(request);
           } else if (
@@ -64,22 +62,62 @@ export default function UserPage() {
             !checkIfCurrentlyRenting(request.startDate, request.endDate) &&
             !checkIfDateIsPassed(request.endDate)
           ) {
-            approved.push(request);
+            approvedWithoutCarDetails.push(request);
           } else if (
             request.status === "approved" &&
             checkIfCurrentlyRenting(request.startDate, request.endDate)
           ) {
-            renting.push(request);
+            rentingWithoutCarDetails.push(request);
           }
         });
-        // Update state once with the collected data
+
         setPendingRequests(pending);
-        setApprovedRequests(approved);
-        setCurrentlyRentinge(renting);
-      })
-      .catch((error) => {
-        console.error("Error fetching user requests:", error);
-      });
+
+        // Fetch car details for approved requests
+        const approvedWithCarDetails = await Promise.all(
+          approvedWithoutCarDetails.map(async (request) => {
+            const carResponse = await axios.get(
+              `http://localhost:3000/cars/${request.assigned_car_id}`,
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+            );
+            return {
+              ...request,
+              brand: carResponse.data.brand,
+              fuel: carResponse.data.fuel,
+              MA_transmission: carResponse.data.MA_transmission,
+            };
+          })
+        );
+
+        setApprovedRequests(approvedWithCarDetails);
+
+        // Fetch car details for currently renting requests
+        const rentingWithCarDetails = await Promise.all(
+          rentingWithoutCarDetails.map(async (request) => {
+            const carResponse = await axios.get(
+              `http://localhost:3000/cars/${request.assigned_car_id}`,
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+            );
+            return {
+              ...request,
+              brand: carResponse.data.brand,
+              fuel: carResponse.data.fuel,
+              MA_transmission: carResponse.data.MA_transmission,
+            };
+          })
+        );
+
+        setCurrentlyRenting(rentingWithCarDetails);
+      } catch (error) {
+        console.error("Error fetching user data or requests:", error);
+      }
+    };
+
+    fetchUserData();
   }, [modal]);
 
   if (!user) {
@@ -107,13 +145,20 @@ export default function UserPage() {
       <h1>Welcome {user.name}</h1>
       <p>Email: {user.email}</p>
       <hr />
+
       <h3>Currently renting:</h3>
       {currentlyRenting.length > 0 ? (
-        <div className="requests-container">
+        <div className="requests">
           {currentlyRenting.map((request) => (
             <div key={request.id} className="request-div-renting">
               <p>
-                <strong>Car type:</strong> {request.carType}
+                <strong>Car:</strong> {request.brand}
+              </p>
+              <p>
+                <strong>Fuel:</strong> {request.fuel}
+              </p>
+              <p>
+                <strong>Transmission:</strong> {request.MA_transmission}
               </p>
               <p>
                 <strong>Start Date: </strong>
@@ -122,7 +167,7 @@ export default function UserPage() {
               <p>
                 <strong>End Date:</strong> {formatDateTime(request.endDate)}
               </p>
-              <p>Reason: {request.reason}</p>
+
               <p>Request status: {request.status}</p>
             </div>
           ))}
@@ -131,47 +176,18 @@ export default function UserPage() {
         <p>Currently not renting anything</p>
       )}
       <hr />
+
       <h3>Pending requests:</h3>
-      <div className="scrollable-container">
+      <div className="requests-pending-container">
         {pendingRequests.length > 0 ? (
-          <div className="scrollable-content">
-            {pendingRequests.map((request) => (
-              <div key={request.id} className="card">
-                <p>
-                  <strong>Car type:</strong> {request.carType}
-                </p>
-                <p>
-                  <strong>Reason: </strong>
-                  {request.reason}
-                </p>
-                <p>
-                  <strong>Start Date: </strong>
-                  {formatDateTime(request.startDate)}
-                </p>
-                <p>
-                  <strong>End Date:</strong> {formatDateTime(request.endDate)}
-                </p>
-                <p>
-                  <strong>Status:</strong> {request.status}
-                </p>
-                <button onClick={() => openModal(request)}>
-                  Cancel request
-                </button>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p>No pending requests</p>
-        )}
-      </div>
-      <hr />
-      <h4>Upcoming approved:</h4>
-      {approvedRequests.length > 0 ? (
-        <div className="requests-container">
-          {approvedRequests.map((request) => (
-            <div key={request.id} className="request-div-approved">
+          pendingRequests.map((request) => (
+            <div key={request.id} className="request-div-pending">
               <p>
                 <strong>Car type:</strong> {request.carType}
+              </p>
+              <p>
+                <strong>Reason: </strong>
+                {request.reason}
               </p>
               <p>
                 <strong>Start Date: </strong>
@@ -181,8 +197,40 @@ export default function UserPage() {
                 <strong>End Date:</strong> {formatDateTime(request.endDate)}
               </p>
               <p>
-                <strong>Reason:</strong> {request.reason}
+                <strong>Status:</strong> {request.status}
               </p>
+              <button onClick={() => openModal(request)}>Cancel request</button>
+            </div>
+          ))
+        ) : (
+          <p>No pending requests</p>
+        )}
+      </div>
+
+      <hr />
+
+      <h4>Upcoming approved:</h4>
+      {approvedRequests.length > 0 ? (
+        <div className="requests">
+          {approvedRequests.map((request) => (
+            <div key={request.id} className="request-div-approved">
+              <p>
+                <strong>Car:</strong> {request.brand}
+              </p>
+              <p>
+                <strong>Fuel:</strong> {request.fuel}
+              </p>
+              <p>
+                <strong>Transmission:</strong> {request.MA_transmission}
+              </p>
+              <p>
+                <strong>Start Date: </strong>
+                {formatDateTime(request.startDate)}
+              </p>
+              <p>
+                <strong>End Date:</strong> {formatDateTime(request.endDate)}
+              </p>
+
               <p>
                 <strong>Request status:</strong> {request.status}
               </p>
@@ -193,6 +241,7 @@ export default function UserPage() {
       ) : (
         <p>No upcoming reservations</p>
       )}
+
       {modal && (
         <CancelRequestModal setModal={setModal} cancelReq={cancelReq} />
       )}
