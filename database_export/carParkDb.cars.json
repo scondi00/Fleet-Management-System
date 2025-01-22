@@ -1,0 +1,124 @@
+[{
+  "_id": {
+    "$oid": "67911e4ab0130cb0d79c8a25"
+  },
+  "brand": "Suzuki Vitara",
+  "carType": "standard",
+  "fuel": "Petrol",
+  "MA_transmission": "Manual",
+  "damaged": false,
+  "damageReport": "",
+  "aviability": true,
+  "reservations": [],
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67911e50b0130cb0d79c8a27"
+  },
+  "brand": "Mini Cooper Clubman/S",
+  "carType": "mini",
+  "fuel": "Diesel",
+  "MA_transmission": "Manual",
+  "damaged": false,
+  "damageReport": "",
+  "aviability": true,
+  "reservations": [
+    {
+      "startDate": {
+        "$date": "2025-01-13T23:00:00.000Z"
+      },
+      "endDate": {
+        "$date": "2025-02-13T23:00:00.000Z"
+      },
+      "requester_id": {
+        "$oid": "67911db7b0130cb0d79c89f2"
+      },
+      "request_id": {
+        "$oid": "67911ecbb0130cb0d79c8a5a"
+      },
+      "_id": {
+        "$oid": "67911ef5b0130cb0d79c8a76"
+      }
+    }
+  ],
+  "__v": 1
+},
+{
+  "_id": {
+    "$oid": "67911e58b0130cb0d79c8a29"
+  },
+  "brand": "Kia Carnival",
+  "carType": "minivan",
+  "fuel": "Diesel",
+  "MA_transmission": "Automatic",
+  "damaged": false,
+  "damageReport": "",
+  "aviability": true,
+  "reservations": [
+    {
+      "startDate": {
+        "$date": "2025-07-19T22:00:00.000Z"
+      },
+      "endDate": {
+        "$date": "2025-07-24T22:00:00.000Z"
+      },
+      "requester_id": {
+        "$oid": "67911db7b0130cb0d79c89f2"
+      },
+      "request_id": {
+        "$oid": "67911f52b0130cb0d79c8aad"
+      },
+      "_id": {
+        "$oid": "67911f60b0130cb0d79c8ab7"
+      }
+    }
+  ],
+  "__v": 1
+},
+{
+  "_id": {
+    "$oid": "67911e69b0130cb0d79c8a2f"
+  },
+  "brand": "Toyota Sedan",
+  "carType": "standard",
+  "fuel": "Petrol",
+  "MA_transmission": "Manual",
+  "damaged": false,
+  "damageReport": "",
+  "aviability": true,
+  "reservations": [
+    {
+      "startDate": {
+        "$date": "2024-12-14T23:00:00.000Z"
+      },
+      "endDate": {
+        "$date": "2024-12-17T23:00:00.000Z"
+      },
+      "requester_id": {
+        "$oid": "67911db7b0130cb0d79c89f2"
+      },
+      "request_id": {
+        "$oid": "67911decb0130cb0d79c8a0f"
+      },
+      "_id": {
+        "$oid": "67911e7bb0130cb0d79c8a36"
+      }
+    }
+  ],
+  "__v": 1
+},
+{
+  "_id": {
+    "$oid": "67911f09b0130cb0d79c8a8f"
+  },
+  "brand": "Opel Corsa",
+  "carType": "standard",
+  "fuel": "Petrol",
+  "MA_transmission": "Automatic",
+  "damaged": false,
+  "damageReport": "Car is due to servis.",
+  "aviability": false,
+  "reservations": [],
+  "__v": 0
+}]

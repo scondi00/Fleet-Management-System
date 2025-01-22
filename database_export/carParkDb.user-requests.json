@@ -1,0 +1,111 @@
+[{
+  "_id": {
+    "$oid": "67911dd1b0130cb0d79c8a05"
+  },
+  "name": "Marko",
+  "email": "marko@email.com",
+  "carType": "mini",
+  "reason": "leasure",
+  "status": "denied",
+  "startDate": {
+    "$date": "2025-03-01T23:00:00.000Z"
+  },
+  "endDate": {
+    "$date": "2025-03-06T23:00:00.000Z"
+  },
+  "requester": {
+    "$oid": "67911db7b0130cb0d79c89f2"
+  },
+  "assigned_car_id": null,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67911decb0130cb0d79c8a0f"
+  },
+  "name": "Marko",
+  "email": "marko@email.com",
+  "carType": "standard",
+  "reason": "business",
+  "status": "approved",
+  "startDate": {
+    "$date": "2024-12-14T23:00:00.000Z"
+  },
+  "endDate": {
+    "$date": "2024-12-17T23:00:00.000Z"
+  },
+  "requester": {
+    "$oid": "67911db7b0130cb0d79c89f2"
+  },
+  "assigned_car_id": {
+    "$oid": "67911e69b0130cb0d79c8a2f"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67911dfab0130cb0d79c8a13"
+  },
+  "name": "Marko",
+  "email": "marko@email.com",
+  "carType": "standard",
+  "reason": "business",
+  "status": "pending",
+  "startDate": {
+    "$date": "2025-02-15T23:00:00.000Z"
+  },
+  "endDate": {
+    "$date": "2025-02-19T23:00:00.000Z"
+  },
+  "requester": {
+    "$oid": "67911db7b0130cb0d79c89f2"
+  },
+  "assigned_car_id": null,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67911ecbb0130cb0d79c8a5a"
+  },
+  "name": "Marko",
+  "email": "marko@email.com",
+  "carType": "mini",
+  "reason": "business",
+  "status": "approved",
+  "startDate": {
+    "$date": "2025-01-13T23:00:00.000Z"
+  },
+  "endDate": {
+    "$date": "2025-02-13T23:00:00.000Z"
+  },
+  "requester": {
+    "$oid": "67911db7b0130cb0d79c89f2"
+  },
+  "assigned_car_id": {
+    "$oid": "67911e50b0130cb0d79c8a27"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67911f52b0130cb0d79c8aad"
+  },
+  "name": "Marko",
+  "email": "marko@email.com",
+  "carType": "minivan",
+  "reason": "business",
+  "status": "approved",
+  "startDate": {
+    "$date": "2025-07-19T22:00:00.000Z"
+  },
+  "endDate": {
+    "$date": "2025-07-24T22:00:00.000Z"
+  },
+  "requester": {
+    "$oid": "67911db7b0130cb0d79c89f2"
+  },
+  "assigned_car_id": {
+    "$oid": "67911e58b0130cb0d79c8a29"
+  },
+  "__v": 0
+}]

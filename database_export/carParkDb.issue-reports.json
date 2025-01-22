@@ -1,0 +1,18 @@
+[{
+  "_id": {
+    "$oid": "67911edab0130cb0d79c8a6e"
+  },
+  "carId": {
+    "$oid": "67911e69b0130cb0d79c8a2f"
+  },
+  "submissioner_id": {
+    "$oid": "67911db7b0130cb0d79c89f2"
+  },
+  "issueType": "Brakes",
+  "description": "Brake issue",
+  "status": "pending",
+  "createdAt": {
+    "$date": "2025-01-22T16:37:46.755Z"
+  },
+  "__v": 0
+}]
